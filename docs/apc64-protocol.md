@@ -11,7 +11,15 @@ Stand: 29.09.2026. Quelle: Lives eigenes APC64-Script (dekompiliert in [gluon/Ab
 - **Zeilenbreite:** Proportionale Schrift, Text wird **zentriert** und links und rechts abgeschnitten. Bei 20 Zeichen sichtbar: Zeile 1 `E`–`P` (12 Großbuchstaben), Zeile 2 `c`–`q` (15 Kleinbuchstaben), Zeile 3 `4`–`F` (12 Ziffern/Großbuchstaben). Faustregel: ca. 12 Zeichen, bei Kleinbuchstaben etwas mehr.
 - **Header-Farbe über Note 89** hat auf den Kanälen 1, 2, 7 und 16 **nicht** reagiert. **Achtung:** Dieser Test (Note On 89 auf Kanal 1, 2, 7 und 16 mit Note Off) hat das Display danach gesperrt, bis das APC64 aus- und wieder eingeschaltet wurde. Pads funktionierten weiter. Welche Nachricht genau schuld ist, ist offen. Bis dahin Note 89 außer auf Kanal 7 nicht senden.
 - **Wiederholbarkeit:** Ohne den Header-Test funktioniert das Display auch bei mehreren Läufen hintereinander, jeweils mit Identity-Abfrage vorweg.
-- **Noch offen:** Header-Farbe (welche Nachricht sperrt das Display?), Eingaben mitschneiden (Pad-Velocity/Aftertouch, Strip-Auflösung, Encoder), Werte für den Firmware-Modus `19`.
+- **Eingaben** (`tools/apc_monitor.ps1`, 45 s, 828 Nachrichten, nach Identity-Abfrage):
+  - **Port „APC64“** (Script-Port):
+    - Pads schicken Note **0–63 auf Kanal 7** mit **fester Velocity 127**, Note Off beim Loslassen.
+    - Buttons und Strip-Berührungen schicken Noten 64–126 auf **Kanal 1**, Velocity 127.
+    - Encoder: **CC 90**, `1` = rechts, `127` = links.
+    - Touch-Strips: **Pitch Bend auf Kanal 1–8** (Strip 1 nicht getestet), Bereich 0–16383, **kleinster Schritt 64**, also effektiv **256 Stufen**.
+  - **Port „MIDIIN2 (APC64)“** gleichzeitig: dieselben Pad-Anschläge als **Musiknoten 24–83 auf Kanal 1** mit **echter Velocity** (12–127) und **polyphonem Aftertouch** (0–127, `A0`).
+  - Für ein Script heißt das: Pad-Position über den Script-Port, Anschlagstärke und Druck über „MIDIIN2 (APC64)“. Beide Ports müsste das Script abhören, oder der Modus lässt sich umstellen (offen).
+- **Noch offen:** Header-Farbe (welche Nachricht sperrt das Display?), wie die Pad-Noten 0–63 den Musiknoten 24–83 zugeordnet sind, Werte für den Firmware-Modus `19`.
 
 ## SysEx
 

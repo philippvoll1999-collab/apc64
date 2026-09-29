@@ -1,0 +1,828 @@
+   1383 ms  MIDIIN2 (APC64)    90  38  56
+   1419 ms  MIDIIN2 (APC64)    80  38   0
+   1482 ms  MIDIIN2 (APC64)    90  41  50
+   1551 ms  MIDIIN2 (APC64)    80  41   0
+   1582 ms  MIDIIN2 (APC64)    90  52  29
+   1584 ms  MIDIIN2 (APC64)    90  50  33
+   1629 ms  MIDIIN2 (APC64)    80  52   0
+   1655 ms  MIDIIN2 (APC64)    80  50   0
+   1672 ms  MIDIIN2 (APC64)    90  48  84
+   1750 ms  MIDIIN2 (APC64)    80  48   0
+   1786 ms  MIDIIN2 (APC64)    90  59  41
+   1791 ms  MIDIIN2 (APC64)    90  57  64
+   1833 ms  MIDIIN2 (APC64)    80  57   0
+   1843 ms  MIDIIN2 (APC64)    80  59   0
+   1874 ms  MIDIIN2 (APC64)    90  62  40
+   1939 ms  MIDIIN2 (APC64)    80  62   0
+   1984 ms  MIDIIN2 (APC64)    90  72  62
+   1996 ms  MIDIIN2 (APC64)    90  71  55
+   2054 ms  MIDIIN2 (APC64)    80  72   0
+   2079 ms  MIDIIN2 (APC64)    A0  71  10
+   2080 ms  MIDIIN2 (APC64)    A0  71   0
+   2080 ms  MIDIIN2 (APC64)    80  71   0
+   2086 ms  MIDIIN2 (APC64)    90  67  12
+   2135 ms  MIDIIN2 (APC64)    80  67   0
+   2184 ms  MIDIIN2 (APC64)    90  72  49
+   2189 ms  MIDIIN2 (APC64)    90  71  43
+   2215 ms  MIDIIN2 (APC64)    80  72   0
+   2256 ms  MIDIIN2 (APC64)    80  71   0
+   2272 ms  MIDIIN2 (APC64)    90  71  12
+   2279 ms  MIDIIN2 (APC64)    90  62  15
+   2288 ms  MIDIIN2 (APC64)    80  71   0
+   2354 ms  MIDIIN2 (APC64)    80  62   0
+   2736 ms  MIDIIN2 (APC64)    90  69  12
+   2736 ms  MIDIIN2 (APC64)    90  72  12
+   2736 ms  MIDIIN2 (APC64)    90  76  12
+   2762 ms  MIDIIN2 (APC64)    90  67  30
+   2762 ms  MIDIIN2 (APC64)    90  71  30
+   2762 ms  MIDIIN2 (APC64)    90  74  30
+   2805 ms  MIDIIN2 (APC64)    A0  69  17
+   2805 ms  MIDIIN2 (APC64)    A0  72  17
+   2805 ms  MIDIIN2 (APC64)    A0  76  17
+   2824 ms  MIDIIN2 (APC64)    A0  69   0
+   2824 ms  MIDIIN2 (APC64)    A0  72   0
+   2824 ms  MIDIIN2 (APC64)    A0  76   0
+   2824 ms  MIDIIN2 (APC64)    80  69   0
+   2824 ms  MIDIIN2 (APC64)    80  72   0
+   2824 ms  MIDIIN2 (APC64)    80  76   0
+   2832 ms  MIDIIN2 (APC64)    90  65  18
+   2832 ms  MIDIIN2 (APC64)    90  69  18
+   2832 ms  MIDIIN2 (APC64)    90  72  18
+   2845 ms  MIDIIN2 (APC64)    A0  67  30
+   2845 ms  MIDIIN2 (APC64)    A0  71  30
+   2845 ms  MIDIIN2 (APC64)    A0  74  30
+   2865 ms  MIDIIN2 (APC64)    A0  67  16
+   2865 ms  MIDIIN2 (APC64)    A0  71  16
+   2865 ms  MIDIIN2 (APC64)    A0  74  16
+   2868 ms  MIDIIN2 (APC64)    90  64  58
+   2868 ms  MIDIIN2 (APC64)    80  67   0
+   2869 ms  MIDIIN2 (APC64)    90  67  58
+   2869 ms  MIDIIN2 (APC64)    80  71   0
+   2869 ms  MIDIIN2 (APC64)    90  71  58
+   2877 ms  MIDIIN2 (APC64)    A0  67   0
+   2877 ms  MIDIIN2 (APC64)    A0  71   0
+   2877 ms  MIDIIN2 (APC64)    A0  74   0
+   2877 ms  MIDIIN2 (APC64)    80  74   0
+   2892 ms  MIDIIN2 (APC64)    80  65   0
+   2892 ms  MIDIIN2 (APC64)    80  69   0
+   2892 ms  MIDIIN2 (APC64)    80  72   0
+   2945 ms  MIDIIN2 (APC64)    A0  64  40
+   2946 ms  MIDIIN2 (APC64)    A0  67  40
+   2946 ms  MIDIIN2 (APC64)    A0  71  40
+   2956 ms  MIDIIN2 (APC64)    A0  64   0
+   2956 ms  MIDIIN2 (APC64)    A0  67   0
+   2956 ms  MIDIIN2 (APC64)    A0  71   0
+   2956 ms  MIDIIN2 (APC64)    80  64   0
+   2956 ms  MIDIIN2 (APC64)    80  67   0
+   2956 ms  MIDIIN2 (APC64)    80  71   0
+   2987 ms  MIDIIN2 (APC64)    90  74  50
+   2987 ms  MIDIIN2 (APC64)    90  77  50
+   2987 ms  MIDIIN2 (APC64)    90  81  50
+   2997 ms  MIDIIN2 (APC64)    90  72  65
+   2997 ms  MIDIIN2 (APC64)    90  76  65
+   2997 ms  MIDIIN2 (APC64)    90  79  65
+   3065 ms  MIDIIN2 (APC64)    80  74   0
+   3065 ms  MIDIIN2 (APC64)    80  77   0
+   3065 ms  MIDIIN2 (APC64)    80  81   0
+   3066 ms  MIDIIN2 (APC64)    A0  72  55
+   3066 ms  MIDIIN2 (APC64)    A0  76  55
+   3066 ms  MIDIIN2 (APC64)    A0  79  55
+   3080 ms  MIDIIN2 (APC64)    90  69  13
+   3080 ms  MIDIIN2 (APC64)    80  72   0
+   3080 ms  MIDIIN2 (APC64)    90  72  13
+   3080 ms  MIDIIN2 (APC64)    80  76   0
+   3080 ms  MIDIIN2 (APC64)    90  76  13
+   3086 ms  MIDIIN2 (APC64)    A0  72  32
+   3086 ms  MIDIIN2 (APC64)    A0  76  32
+   3086 ms  MIDIIN2 (APC64)    A0  79  32
+   3094 ms  MIDIIN2 (APC64)    A0  72   0
+   3094 ms  MIDIIN2 (APC64)    A0  76   0
+   3094 ms  MIDIIN2 (APC64)    A0  79   0
+   3094 ms  MIDIIN2 (APC64)    80  79   0
+   3160 ms  MIDIIN2 (APC64)    80  69   0
+   3160 ms  MIDIIN2 (APC64)    80  72   0
+   3160 ms  MIDIIN2 (APC64)    80  76   0
+  10753 ms  APC64              96  28 127
+  10792 ms  APC64              86  28   0
+  10976 ms  APC64              96  28 127
+  10979 ms  APC64              96  20 127
+  10995 ms  APC64              86  20   0
+  11022 ms  APC64              86  28   0
+  11411 ms  MIDIIN2 (APC64)    90  52  89
+  11471 ms  MIDIIN2 (APC64)    80  52   0
+  11605 ms  MIDIIN2 (APC64)    90  52  51
+  11643 ms  MIDIIN2 (APC64)    80  52   0
+  11793 ms  MIDIIN2 (APC64)    90  52  80
+  11846 ms  MIDIIN2 (APC64)    80  52   0
+  11980 ms  MIDIIN2 (APC64)    90  52 127
+  12057 ms  MIDIIN2 (APC64)    A0  52 126
+  12077 ms  MIDIIN2 (APC64)    A0  52 127
+  12299 ms  MIDIIN2 (APC64)    A0  52  71
+  12317 ms  MIDIIN2 (APC64)    A0  52   0
+  12317 ms  MIDIIN2 (APC64)    80  52   0
+  12464 ms  MIDIIN2 (APC64)    90  52 104
+  12528 ms  MIDIIN2 (APC64)    80  52   0
+  12665 ms  MIDIIN2 (APC64)    90  52  42
+  12717 ms  MIDIIN2 (APC64)    80  52   0
+  12875 ms  MIDIIN2 (APC64)    90  52  57
+  12930 ms  MIDIIN2 (APC64)    80  52   0
+  13244 ms  APC64              96  28 127
+  13297 ms  APC64              86  28   0
+  13439 ms  APC64              96  28 127
+  13487 ms  APC64              86  28   0
+  13619 ms  APC64              96  28 127
+  13684 ms  APC64              86  28   0
+  13827 ms  APC64              96  28 127
+  13939 ms  APC64              86  28   0
+  14056 ms  APC64              96  37 127
+  14158 ms  APC64              96  36 127
+  14175 ms  APC64              86  37   0
+  14275 ms  APC64              86  36   0
+  14310 ms  APC64              96  38 127
+  14331 ms  APC64              96  41 127
+  14340 ms  APC64              96  45 127
+  14406 ms  APC64              96  34 127
+  14420 ms  APC64              86  38   0
+  14426 ms  APC64              86  41   0
+  14473 ms  APC64              86  45   0
+  14559 ms  APC64              86  34   0
+  14608 ms  APC64              96  46 127
+  14621 ms  APC64              96  45 127
+  14624 ms  APC64              96  36 127
+  14648 ms  APC64              86  45   0
+  14649 ms  APC64              86  46   0
+  14673 ms  APC64              86  36   0
+  14810 ms  APC64              96  33 127
+  14810 ms  APC64              96  41 127
+  14814 ms  APC64              96  40 127
+  14824 ms  APC64              96  34 127
+  14826 ms  APC64              86  33   0
+  14858 ms  APC64              86  40   0
+  14862 ms  APC64              86  41   0
+  14992 ms  APC64              86  34   0
+  14997 ms  APC64              96  45 127
+  14998 ms  APC64              96  36 127
+  15002 ms  APC64              96  47 127
+  15018 ms  APC64              86  47   0
+  15041 ms  APC64              86  45   0
+  15095 ms  APC64              86  36   0
+  15147 ms  APC64              96  33 127
+  15235 ms  APC64              96  26 127
+  15239 ms  APC64              96  34 127
+  15253 ms  APC64              86  34   0
+  15278 ms  APC64              86  33   0
+  15302 ms  APC64              96  34 127
+  15331 ms  APC64              86  34   0
+  15352 ms  APC64              96  28 127
+  15360 ms  APC64              86  26   0
+  15364 ms  APC64              96  37 127
+  15389 ms  APC64              86  37   0
+  15414 ms  APC64              86  28   0
+  15531 ms  APC64              96  27 127
+  15654 ms  APC64              86  27   0
+  15683 ms  APC64              96  33 127
+  15688 ms  APC64              96  26 127
+  15688 ms  APC64              96  29 127
+  15764 ms  APC64              96  30 127
+  15768 ms  APC64              96  28 127
+  15793 ms  APC64              96  23 127
+  15807 ms  APC64              96  19 127
+  15881 ms  APC64              86  23   0
+  16260 ms  APC64              86  19   0
+  16387 ms  APC64              96  27 127
+  17395 ms  APC64              86  28   0
+  17398 ms  APC64              86  27   0
+  17452 ms  APC64              86  33   0
+  17459 ms  APC64              86  29   0
+  17470 ms  APC64              86  30   0
+  17534 ms  APC64              86  26   0
+  17824 ms  APC64              90  87 127
+  17824 ms  APC64              E5   0   0
+  17911 ms  APC64              90  86 127
+  17911 ms  APC64              E4   0   0
+  17955 ms  APC64              80  86   0
+  17969 ms  APC64              90  86 127
+  17969 ms  APC64              E4   0   0
+  18001 ms  APC64              E5  64   1
+  18015 ms  APC64              E5  66   4
+  18028 ms  APC64              E4  65   3
+  18030 ms  APC64              E5  67   7
+  18043 ms  APC64              E4  68   8
+  18044 ms  APC64              E5  69  11
+  18057 ms  APC64              E4  69  10
+  18059 ms  APC64              E5  71  15
+  18072 ms  APC64              E4  71  15
+  18074 ms  APC64              E5  74  20
+  18087 ms  APC64              E4  74  21
+  18089 ms  APC64              E5  78  28
+  18101 ms  APC64              E4  78  29
+  18103 ms  APC64              E5  81  34
+  18116 ms  APC64              E4  83  38
+  18118 ms  APC64              E5  85  42
+  18131 ms  APC64              E4  87  46
+  18132 ms  APC64              E5  89  50
+  18146 ms  APC64              E4  90  53
+  18148 ms  APC64              E5  94  60
+  18161 ms  APC64              E4  93  59
+  18163 ms  APC64              E5  96  65
+  18176 ms  APC64              E4  96  64
+  18178 ms  APC64              E5 100  72
+  18191 ms  APC64              E4  99  71
+  18193 ms  APC64              E5 103  78
+  18207 ms  APC64              E4 102  77
+  18208 ms  APC64              E5 106  85
+  18221 ms  APC64              E4 105  82
+  18223 ms  APC64              E5 109  90
+  18235 ms  APC64              E4 108  88
+  18237 ms  APC64              E5 112  96
+  18249 ms  APC64              E4 110  92
+  18251 ms  APC64              E5 113  98
+  18265 ms  APC64              E4 111  95
+  18267 ms  APC64              E5 113  99
+  18288 ms  APC64              90  83 127
+  18288 ms  APC64              E1 106  85
+  18294 ms  APC64              E4 111  94
+  18296 ms  APC64              E5  49  99
+  18303 ms  APC64              80  83   0
+  18309 ms  APC64              E4  46  92
+  18310 ms  APC64              E5  48  96
+  18323 ms  APC64              E4  44  89
+  18325 ms  APC64              E5  47  94
+  18338 ms  APC64              E4  43  86
+  18340 ms  APC64              E5  45  91
+  18353 ms  APC64              E4 105  82
+  18356 ms  APC64              E5 107  87
+  18369 ms  APC64              E4 103  78
+  18371 ms  APC64              E5 105  82
+  18384 ms  APC64              E4 100  72
+  18386 ms  APC64              E5 101  75
+  18399 ms  APC64              E4  34  69
+  18400 ms  APC64              E5  35  70
+  18413 ms  APC64              E4  31  63
+  18416 ms  APC64              E5  95  63
+  18422 ms  APC64              90  83 127
+  18422 ms  APC64              E1 105  82
+  18428 ms  APC64              E4  28  57
+  18430 ms  APC64              E5  29  58
+  18437 ms  APC64              E1  41  82
+  18443 ms  APC64              E4  88  49
+  18445 ms  APC64              E5  26  52
+  18453 ms  APC64              E1  40  81
+  18458 ms  APC64              E4  85  42
+  18461 ms  APC64              E5  86  44
+  18468 ms  APC64              E1 104  80
+  18473 ms  APC64              E4  16  33
+  18475 ms  APC64              E5  82  36
+  18488 ms  APC64              E4  76  24
+  18491 ms  APC64              E5  77  26
+  18504 ms  APC64              E4   8  16
+  18507 ms  APC64              E5   9  19
+  18520 ms  APC64              E4  69  10
+  18521 ms  APC64              E5  70  12
+  18534 ms  APC64              E4  66   5
+  18536 ms  APC64              E5  67   7
+  18544 ms  APC64              E1  40  80
+  18549 ms  APC64              E4   0   0
+  18551 ms  APC64              E5   1   2
+  18558 ms  APC64              E1 103  78
+  18566 ms  APC64              E5   0   0
+  18572 ms  APC64              E1 102  77
+  18577 ms  APC64              80  86   0
+  18587 ms  APC64              E1  37  75
+  18595 ms  APC64              80  87   0
+  18603 ms  APC64              E1 100  72
+  18619 ms  APC64              E1  99  70
+  18633 ms  APC64              E1  98  68
+  18643 ms  APC64              90  88 127
+  18643 ms  APC64              E6 127 127
+  18645 ms  APC64              90  89 127
+  18645 ms  APC64              E7  62 124
+  18649 ms  APC64              E1  33  67
+  18663 ms  APC64              E1  96  65
+  18675 ms  APC64              E7 126 124
+  18680 ms  APC64              E1  32  64
+  18691 ms  APC64              E7 127 127
+  18695 ms  APC64              E1  31  63
+  18709 ms  APC64              E1  94  60
+  18720 ms  APC64              E7  62 125
+  18724 ms  APC64              E1  93  59
+  18733 ms  APC64              E6 126 124
+  18736 ms  APC64              E7 124 121
+  18739 ms  APC64              E1  91  55
+  18749 ms  APC64              E6 123 119
+  18750 ms  APC64              E7 123 118
+  18754 ms  APC64              E1  26  53
+  18763 ms  APC64              E6  57 114
+  18765 ms  APC64              E7  57 114
+  18769 ms  APC64              E1  88  48
+  18778 ms  APC64              E6  54 108
+  18780 ms  APC64              E7 118 108
+  18783 ms  APC64              E1  22  45
+  18792 ms  APC64              E6  50 101
+  18794 ms  APC64              E7 115 102
+  18797 ms  APC64              E1  20  41
+  18807 ms  APC64              E6  46  92
+  18809 ms  APC64              E7 111  95
+  18813 ms  APC64              E1  17  35
+  18821 ms  APC64              E6  42  85
+  18823 ms  APC64              E7  44  88
+  18826 ms  APC64              E1  14  28
+  18836 ms  APC64              E6 103  79
+  18837 ms  APC64              E7 103  79
+  18841 ms  APC64              E1   9  18
+  18850 ms  APC64              E6  37  75
+  18852 ms  APC64              E7 101  75
+  18855 ms  APC64              E1   6  13
+  18865 ms  APC64              E6  35  70
+  18866 ms  APC64              E7  99  70
+  18870 ms  APC64              E1  68   8
+  18880 ms  APC64              E6  32  64
+  18881 ms  APC64              E7  33  66
+  18885 ms  APC64              E1  66   5
+  18895 ms  APC64              E6  93  58
+  18896 ms  APC64              E7  30  61
+  18900 ms  APC64              E1  65   2
+  18909 ms  APC64              E6  90  53
+  18911 ms  APC64              E7  27  55
+  18916 ms  APC64              E1   0   0
+  18925 ms  APC64              E6  24  48
+  18927 ms  APC64              E7  88  48
+  18932 ms  APC64              80  83   0
+  18941 ms  APC64              E6  85  42
+  18943 ms  APC64              E7  20  41
+  18956 ms  APC64              E6  80  33
+  18958 ms  APC64              E7  79  31
+  18970 ms  APC64              E6  14  28
+  18971 ms  APC64              E7  13  26
+  18985 ms  APC64              E6  11  23
+  18987 ms  APC64              E7  73  19
+  19000 ms  APC64              80  88   0
+  19002 ms  APC64              E7   7  14
+  19017 ms  APC64              E7   5  11
+  19033 ms  APC64              80  89   0
+  19085 ms  APC64              90  85 127
+  19085 ms  APC64              E3  30  61
+  19113 ms  APC64              E3  28  57
+  19120 ms  APC64              90  88 127
+  19120 ms  APC64              E6   0   0
+  19130 ms  APC64              E3  26  52
+  19135 ms  APC64              80  88   0
+  19145 ms  APC64              E3  88  49
+  19160 ms  APC64              E3  24  48
+  19189 ms  APC64              E3  87  47
+  19234 ms  APC64              E3  23  46
+  19248 ms  APC64              E3  21  43
+  19263 ms  APC64              E3  19  39
+  19280 ms  APC64              E3  82  37
+  19295 ms  APC64              80  85   0
+  19363 ms  APC64              96   5 127
+  19380 ms  APC64              96   6 127
+  19437 ms  APC64              96   9 127
+  19461 ms  APC64              86   6   0
+  19640 ms  APC64              86   9   0
+  19665 ms  APC64              86   5   0
+  19723 ms  APC64              96   6 127
+  19750 ms  APC64              86   6   0
+  19862 ms  APC64              90 105 127
+  20051 ms  APC64              90 106 127
+  20203 ms  APC64              80 106   0
+  20248 ms  APC64              80 105   0
+  20351 ms  APC64              90  66 127
+  20635 ms  APC64              80  66   0
+  20679 ms  APC64              90 114 127
+  20844 ms  APC64              90 115 127
+  20867 ms  APC64              80 114   0
+  21008 ms  APC64              90 116 127
+  21014 ms  APC64              80 115   0
+  21169 ms  APC64              90 117 127
+  21189 ms  APC64              80 116   0
+  21332 ms  APC64              80 117   0
+  21352 ms  APC64              90 118 127
+  21497 ms  APC64              80 118   0
+  21519 ms  APC64              90 119 127
+  21664 ms  APC64              90 126 127
+  21777 ms  APC64              80 126   0
+  21828 ms  APC64              80 119   0
+  21849 ms  APC64              90  72 127
+  21909 ms  APC64              80  72   0
+  21954 ms  APC64              90  73 127
+  22024 ms  APC64              80  73   0
+  22047 ms  APC64              90  74 127
+  22113 ms  APC64              80  74   0
+  22167 ms  APC64              90  76 127
+  22234 ms  APC64              80  76   0
+  22255 ms  APC64              90  87 127
+  22255 ms  APC64              E5   0   0
+  22281 ms  APC64              90  75 127
+  22324 ms  APC64              90  86 127
+  22324 ms  APC64              E4   0   0
+  22341 ms  APC64              E5  64   0
+  22355 ms  APC64              E5  65   3
+  22358 ms  APC64              80  75   0
+  22370 ms  APC64              E5  67   6
+  22382 ms  APC64              E4  65   2
+  22384 ms  APC64              E5  69  10
+  22398 ms  APC64              E4  66   5
+  22400 ms  APC64              E5  70  13
+  22412 ms  APC64              E4  68   8
+  22414 ms  APC64              E5  71  15
+  22427 ms  APC64              E4  69  10
+  22429 ms  APC64              E5  72  17
+  22442 ms  APC64              E4  70  12
+  22444 ms  APC64              E5  74  20
+  22457 ms  APC64              E4  71  14
+  22459 ms  APC64              E5  75  23
+  22472 ms  APC64              E4  72  16
+  22474 ms  APC64              E5  77  26
+  22486 ms  APC64              E4  73  18
+  22488 ms  APC64              E5  78  29
+  22501 ms  APC64              E4  74  21
+  22502 ms  APC64              E5  80  32
+  22515 ms  APC64              E4  75  23
+  22517 ms  APC64              E5  81  35
+  22530 ms  APC64              E4  76  25
+  22532 ms  APC64              E5  82  37
+  22545 ms  APC64              E4  77  26
+  22547 ms  APC64              E5  83  39
+  22559 ms  APC64              E4  78  29
+  22561 ms  APC64              E5  85  43
+  22574 ms  APC64              E4  79  30
+  22576 ms  APC64              E5  86  45
+  22589 ms  APC64              E4  81  34
+  22591 ms  APC64              E5  88  48
+  22603 ms  APC64              E4  82  37
+  22605 ms  APC64              E5  88  49
+  22618 ms  APC64              E4  83  39
+  22620 ms  APC64              E5  89  51
+  22633 ms  APC64              E4  85  43
+  22635 ms  APC64              E5  91  54
+  22649 ms  APC64              E4  87  46
+  22651 ms  APC64              E5  92  57
+  22664 ms  APC64              E4  89  51
+  22666 ms  APC64              E5  93  59
+  22679 ms  APC64              E4  91  54
+  22681 ms  APC64              E5  95  62
+  22694 ms  APC64              E4  92  56
+  22695 ms  APC64              E5  96  64
+  22708 ms  APC64              E4  93  58
+  22710 ms  APC64              E5  97  67
+  22723 ms  APC64              E4  94  60
+  22725 ms  APC64              E5  99  70
+  22738 ms  APC64              E4  95  63
+  22740 ms  APC64              E5 100  73
+  22752 ms  APC64              E4  97  66
+  22754 ms  APC64              E5 102  76
+  22767 ms  APC64              E4  98  69
+  22769 ms  APC64              E5 104  80
+  22782 ms  APC64              E4 100  72
+  22783 ms  APC64              E5 106  84
+  22795 ms  APC64              E4 102  76
+  22797 ms  APC64              E5 107  87
+  22809 ms  APC64              E4 103  79
+  22810 ms  APC64              E5 109  91
+  22824 ms  APC64              E4 105  83
+  22826 ms  APC64              E5 112  97
+  22839 ms  APC64              E4 108  88
+  22840 ms  APC64              E5 114 100
+  22853 ms  APC64              E4 110  92
+  22855 ms  APC64              E5 116 104
+  22867 ms  APC64              E4 112  96
+  22869 ms  APC64              E5 118 108
+  22882 ms  APC64              E4 114 100
+  22884 ms  APC64              E5 119 111
+  22896 ms  APC64              E4 115 102
+  22898 ms  APC64              E5 121 114
+  22912 ms  APC64              E4 118 108
+  22914 ms  APC64              E5 122 117
+  22927 ms  APC64              E4 119 111
+  22929 ms  APC64              E5 123 119
+  22941 ms  APC64              E4 120 113
+  22943 ms  APC64              E5 124 121
+  22956 ms  APC64              E4 121 114
+  22958 ms  APC64              E5 125 122
+  22971 ms  APC64              E4 123 118
+  22973 ms  APC64              E5 126 124
+  22986 ms  APC64              E4 123 119
+  22987 ms  APC64              E5 127 126
+  23001 ms  APC64              E4 124 120
+  23003 ms  APC64              E5 127 127
+  23015 ms  APC64              E4 125 122
+  23030 ms  APC64              E4 125 123
+  23044 ms  APC64              E4 126 124
+  23105 ms  APC64              E4 125 123
+  23120 ms  APC64              E4  61 123
+  23134 ms  APC64              E4 125 122
+  23149 ms  APC64              E4  60 121
+  23163 ms  APC64              E4  59 118
+  23165 ms  APC64              E5  63 126
+  23178 ms  APC64              E4  57 115
+  23180 ms  APC64              E5 126 124
+  23193 ms  APC64              E4  55 111
+  23195 ms  APC64              E5 124 121
+  23209 ms  APC64              E4 117 106
+  23211 ms  APC64              E5  59 119
+  23224 ms  APC64              E4  51 102
+  23226 ms  APC64              E5  57 114
+  23239 ms  APC64              E4  48  96
+  23241 ms  APC64              E5  54 109
+  23253 ms  APC64              E4 108  89
+  23255 ms  APC64              E5  53 106
+  23268 ms  APC64              E4 105  83
+  23269 ms  APC64              E5 114 100
+  23282 ms  APC64              E4  39  79
+  23284 ms  APC64              E5  47  94
+  23297 ms  APC64              E4  37  74
+  23299 ms  APC64              E5 107  87
+  23311 ms  APC64              E4  99  70
+  23313 ms  APC64              E5 105  82
+  23326 ms  APC64              E4  96  65
+  23328 ms  APC64              E5  38  77
+  23340 ms  APC64              E4  31  62
+  23342 ms  APC64              E5  36  72
+  23355 ms  APC64              E4  28  57
+  23357 ms  APC64              E5  34  68
+  23370 ms  APC64              E4  26  53
+  23372 ms  APC64              E5  32  64
+  23384 ms  APC64              E4  88  48
+  23386 ms  APC64              E5  93  59
+  23398 ms  APC64              E4  23  46
+  23400 ms  APC64              E5  92  56
+  23413 ms  APC64              E4  20  40
+  23414 ms  APC64              E5  26  52
+  23427 ms  APC64              E4  81  34
+  23429 ms  APC64              E5  23  47
+  23441 ms  APC64              E4  14  28
+  23443 ms  APC64              E5  84  41
+  23456 ms  APC64              E4  11  23
+  23458 ms  APC64              E5  82  37
+  23470 ms  APC64              E4  73  19
+  23472 ms  APC64              E5  80  32
+  23485 ms  APC64              E4   8  16
+  23486 ms  APC64              E5  14  28
+  23499 ms  APC64              E4   6  13
+  23501 ms  APC64              E5  12  24
+  23513 ms  APC64              E4  69  10
+  23515 ms  APC64              E5   9  19
+  23528 ms  APC64              E4  68   8
+  23529 ms  APC64              E5   8  16
+  23542 ms  APC64              E4  66   5
+  23543 ms  APC64              E5   6  13
+  23557 ms  APC64              E4  65   3
+  23559 ms  APC64              E5  69  10
+  23572 ms  APC64              E4   0   1
+  23573 ms  APC64              E5  67   7
+  23586 ms  APC64              E4  64   0
+  23588 ms  APC64              E5   2   4
+  23601 ms  APC64              E4   0   0
+  23603 ms  APC64              E5  65   2
+  23618 ms  APC64              E5   0   0
+  23631 ms  APC64              80  86   0
+  23677 ms  APC64              80  87   0
+  23945 ms  APC64              90  88 127
+  23945 ms  APC64              E6  62 125
+  23977 ms  APC64              E6 126 124
+  23991 ms  APC64              E6  62 125
+  24007 ms  APC64              E6 126 124
+  24023 ms  APC64              80  88   0
+  24246 ms  APC64              90  88 127
+  24246 ms  APC64              E6 127 127
+  24261 ms  APC64              E6  63 126
+  24275 ms  APC64              E6  62 125
+  24289 ms  APC64              E6 126 125
+  24319 ms  APC64              80  88   0
+  24436 ms  APC64              90  88 127
+  24436 ms  APC64              E6  62 124
+  24451 ms  APC64              E6 125 122
+  24466 ms  APC64              E6  62 124
+  24481 ms  APC64              E6 125 122
+  24495 ms  APC64              E6  61 123
+  24510 ms  APC64              E6 125 122
+  24524 ms  APC64              80  88   0
+  24859 ms  APC64              90  85 127
+  24859 ms  APC64              E3  51 102
+  24888 ms  APC64              E3  50 101
+  24902 ms  APC64              E3 115 102
+  24918 ms  APC64              E3 116 104
+  24974 ms  APC64              90  84 127
+  24974 ms  APC64              E2  59 119
+  24991 ms  APC64              E3  50 101
+  25004 ms  APC64              E2  58 117
+  25005 ms  APC64              E3  48  96
+  25019 ms  APC64              E2  57 114
+  25021 ms  APC64              E3  46  92
+  25034 ms  APC64              E2  55 110
+  25036 ms  APC64              E3  44  88
+  25049 ms  APC64              E2 116 104
+  25051 ms  APC64              E3 106  84
+  25064 ms  APC64              E2  50 101
+  25066 ms  APC64              E3  41  82
+  25079 ms  APC64              E2 113  98
+  25081 ms  APC64              E3  39  79
+  25094 ms  APC64              E2  47  95
+  25096 ms  APC64              E3  37  75
+  25108 ms  APC64              E2 109  91
+  25110 ms  APC64              E3  36  73
+  25123 ms  APC64              E2 108  88
+  25125 ms  APC64              E3  99  71
+  25138 ms  APC64              E2 107  86
+  25140 ms  APC64              E3  35  70
+  25153 ms  APC64              E2  42  85
+  25214 ms  APC64              E3  99  70
+  25226 ms  APC64              E2 106  85
+  25228 ms  APC64              E3  99  71
+  25241 ms  APC64              E2 107  87
+  25243 ms  APC64              E3 100  73
+  25256 ms  APC64              E2 108  89
+  25257 ms  APC64              E3 102  76
+  25270 ms  APC64              E2 110  93
+  25272 ms  APC64              E3 104  80
+  25285 ms  APC64              E2 113  98
+  25287 ms  APC64              E3 106  84
+  25300 ms  APC64              E2 116 104
+  25302 ms  APC64              E3 109  90
+  25314 ms  APC64              E2 119 110
+  25316 ms  APC64              E3 111  95
+  25329 ms  APC64              E2 121 115
+  25330 ms  APC64              E3 115 102
+  25343 ms  APC64              E2 123 118
+  25345 ms  APC64              E3 118 109
+  25358 ms  APC64              E2 125 122
+  25360 ms  APC64              E3 121 114
+  25372 ms  APC64              E2 126 125
+  25374 ms  APC64              E3 123 118
+  25387 ms  APC64              E2 127 127
+  25389 ms  APC64              E3 125 122
+  25397 ms  APC64              90  89 127
+  25397 ms  APC64              E7   4   8
+  25404 ms  APC64              E3 126 124
+  25419 ms  APC64              E3 127 127
+  25426 ms  APC64              E7  67   7
+  25441 ms  APC64              E7  66   4
+  25446 ms  APC64              80  84   0
+  25457 ms  APC64              E7   1   2
+  25464 ms  APC64              80  85   0
+  25472 ms  APC64              80  89   0
+  25815 ms  APC64              B0  90 127
+  25849 ms  APC64              B0  90 127
+  25886 ms  APC64              B0  90 127
+  25916 ms  APC64              B0  90 127
+  25947 ms  APC64              B0  90 127
+  25973 ms  APC64              B0  90 127
+  26013 ms  APC64              B0  90 127
+  26040 ms  APC64              B0  90 127
+  26064 ms  APC64              B0  90 127
+  26190 ms  APC64              B0  90   1
+  26211 ms  APC64              B0  90   1
+  26232 ms  APC64              B0  90   1
+  26258 ms  APC64              B0  90   1
+  26292 ms  APC64              B0  90   1
+  26338 ms  APC64              B0  90   1
+  26376 ms  APC64              B0  90   1
+  26398 ms  APC64              B0  90   1
+  26418 ms  APC64              B0  90   1
+  26756 ms  APC64              90  90 127
+  26937 ms  APC64              80  90   0
+  27272 ms  APC64              96  16 127
+  27303 ms  APC64              96  12 127
+  27312 ms  APC64              96  10 127
+  27335 ms  APC64              86  10   0
+  27352 ms  APC64              86  12   0
+  27362 ms  APC64              96  20 127
+  27366 ms  APC64              96  18 127
+  27368 ms  APC64              86  16   0
+  27386 ms  APC64              86  18   0
+  27399 ms  APC64              96  18 127
+  27403 ms  APC64              86  20   0
+  27415 ms  APC64              86  18   0
+  27583 ms  APC64              96  36 127
+  27607 ms  APC64              86  36   0
+  27631 ms  APC64              96  46 127
+  27637 ms  APC64              96  35 127
+  27653 ms  APC64              86  35   0
+  27666 ms  APC64              96  44 127
+  27669 ms  APC64              86  46   0
+  27712 ms  APC64              86  44   0
+  27714 ms  APC64              96  54 127
+  27743 ms  APC64              96  50 127
+  27760 ms  APC64              96  47 127
+  27778 ms  APC64              86  47   0
+  27795 ms  APC64              86  50   0
+  27816 ms  APC64              96  49 127
+  27834 ms  APC64              96  50 127
+  27872 ms  APC64              86  49   0
+  27886 ms  APC64              96  51 127
+  27922 ms  APC64              86  50   0
+  27923 ms  APC64              86  54   0
+  27929 ms  APC64              86  51   0
+  27955 ms  APC64              96  43 127
+  28002 ms  APC64              96  46 127
+  28096 ms  APC64              96  37 127
+  28096 ms  APC64              86  43   0
+  28115 ms  APC64              86  46   0
+  28119 ms  APC64              96  35 127
+  28148 ms  APC64              86  37   0
+  28168 ms  APC64              86  35   0
+  28549 ms  APC64              96   2 127
+  28565 ms  APC64              86   2   0
+  33424 ms  APC64              96   0 127
+  33485 ms  APC64              86   0   0
+  33582 ms  APC64              96   0 127
+  33664 ms  APC64              86   0   0
+  34746 ms  MIDIIN2 (APC64)    90  74  26
+  34813 ms  MIDIIN2 (APC64)    A0  74  81
+  34833 ms  MIDIIN2 (APC64)    A0  74  61
+  34853 ms  MIDIIN2 (APC64)    A0  74  53
+  34860 ms  MIDIIN2 (APC64)    90  67  53
+  34873 ms  MIDIIN2 (APC64)    A0  74  15
+  34875 ms  MIDIIN2 (APC64)    A0  74   0
+  34875 ms  MIDIIN2 (APC64)    80  74   0
+  34933 ms  MIDIIN2 (APC64)    A0  67  78
+  34954 ms  MIDIIN2 (APC64)    A0  67  49
+  34973 ms  MIDIIN2 (APC64)    A0  67  32
+  34993 ms  MIDIIN2 (APC64)    A0  67  17
+  34995 ms  MIDIIN2 (APC64)    90  60  56
+  35001 ms  MIDIIN2 (APC64)    A0  67   0
+  35001 ms  MIDIIN2 (APC64)    80  67   0
+  35074 ms  MIDIIN2 (APC64)    A0  60  20
+  35094 ms  MIDIIN2 (APC64)    A0  60  10
+  35109 ms  MIDIIN2 (APC64)    90  53  46
+  35110 ms  MIDIIN2 (APC64)    A0  60   0
+  35110 ms  MIDIIN2 (APC64)    80  60   0
+  35166 ms  MIDIIN2 (APC64)    80  53   0
+  35688 ms  MIDIIN2 (APC64)    90  76  30
+  35688 ms  MIDIIN2 (APC64)    90  79  30
+  35688 ms  MIDIIN2 (APC64)    90  83  30
+  35757 ms  MIDIIN2 (APC64)    A0  76  86
+  35757 ms  MIDIIN2 (APC64)    A0  79  86
+  35757 ms  MIDIIN2 (APC64)    A0  83  86
+  35777 ms  MIDIIN2 (APC64)    A0  76  79
+  35777 ms  MIDIIN2 (APC64)    A0  79  79
+  35777 ms  MIDIIN2 (APC64)    A0  83  79
+  35797 ms  MIDIIN2 (APC64)    A0  76  56
+  35797 ms  MIDIIN2 (APC64)    A0  79  56
+  35797 ms  MIDIIN2 (APC64)    A0  83  56
+  35814 ms  MIDIIN2 (APC64)    90  69  37
+  35814 ms  MIDIIN2 (APC64)    90  72  37
+  35814 ms  MIDIIN2 (APC64)    80  76   0
+  35814 ms  MIDIIN2 (APC64)    90  76  37
+  35817 ms  MIDIIN2 (APC64)    A0  76  29
+  35817 ms  MIDIIN2 (APC64)    A0  79  29
+  35817 ms  MIDIIN2 (APC64)    A0  83  29
+  35831 ms  MIDIIN2 (APC64)    A0  76   0
+  35831 ms  MIDIIN2 (APC64)    A0  79   0
+  35831 ms  MIDIIN2 (APC64)    A0  83   0
+  35831 ms  MIDIIN2 (APC64)    80  79   0
+  35831 ms  MIDIIN2 (APC64)    80  83   0
+  35898 ms  MIDIIN2 (APC64)    A0  69  69
+  35898 ms  MIDIIN2 (APC64)    A0  72  69
+  35898 ms  MIDIIN2 (APC64)    A0  76  69
+  35917 ms  MIDIIN2 (APC64)    A0  69  29
+  35917 ms  MIDIIN2 (APC64)    A0  72  29
+  35917 ms  MIDIIN2 (APC64)    A0  76  29
+  35931 ms  MIDIIN2 (APC64)    90  62  54
+  35931 ms  MIDIIN2 (APC64)    90  65  54
+  35931 ms  MIDIIN2 (APC64)    80  69   0
+  35931 ms  MIDIIN2 (APC64)    90  69  54
+  35937 ms  MIDIIN2 (APC64)    A0  69  20
+  35937 ms  MIDIIN2 (APC64)    A0  72  20
+  35937 ms  MIDIIN2 (APC64)    A0  76  20
+  35947 ms  MIDIIN2 (APC64)    A0  69   0
+  35947 ms  MIDIIN2 (APC64)    A0  72   0
+  35947 ms  MIDIIN2 (APC64)    A0  76   0
+  35947 ms  MIDIIN2 (APC64)    80  72   0
+  35947 ms  MIDIIN2 (APC64)    80  76   0
+  36018 ms  MIDIIN2 (APC64)    A0  62  91
+  36018 ms  MIDIIN2 (APC64)    A0  65  91
+  36018 ms  MIDIIN2 (APC64)    A0  69  91
+  36038 ms  MIDIIN2 (APC64)    A0  62  38
+  36038 ms  MIDIIN2 (APC64)    A0  65  38
+  36038 ms  MIDIIN2 (APC64)    A0  69  38
+  36058 ms  MIDIIN2 (APC64)    90  55  52
+  36058 ms  MIDIIN2 (APC64)    90  59  52
+  36058 ms  MIDIIN2 (APC64)    80  62   0
+  36058 ms  MIDIIN2 (APC64)    90  62  52
+  36059 ms  MIDIIN2 (APC64)    A0  62  10
+  36059 ms  MIDIIN2 (APC64)    A0  65  10
+  36059 ms  MIDIIN2 (APC64)    A0  69  10
+  36071 ms  MIDIIN2 (APC64)    A0  62   0
+  36071 ms  MIDIIN2 (APC64)    A0  65   0
+  36071 ms  MIDIIN2 (APC64)    A0  69   0
+  36071 ms  MIDIIN2 (APC64)    80  65   0
+  36071 ms  MIDIIN2 (APC64)    80  69   0
+  36139 ms  MIDIIN2 (APC64)    A0  55  51
+  36139 ms  MIDIIN2 (APC64)    A0  59  51
+  36139 ms  MIDIIN2 (APC64)    A0  62  51
+  36156 ms  MIDIIN2 (APC64)    A0  55   0
+  36156 ms  MIDIIN2 (APC64)    A0  59   0
+  36156 ms  MIDIIN2 (APC64)    A0  62   0
+  36157 ms  MIDIIN2 (APC64)    80  55   0
+  36157 ms  MIDIIN2 (APC64)    80  59   0
+  36157 ms  MIDIIN2 (APC64)    80  62   0
+  37479 ms  MIDIIN2 (APC64)    90  38  71
+  37647 ms  MIDIIN2 (APC64)    80  38   0
+  37683 ms  MIDIIN2 (APC64)    90  31  30
+  37811 ms  MIDIIN2 (APC64)    90  24  52
+  37825 ms  MIDIIN2 (APC64)    80  31   0
+  37852 ms  MIDIIN2 (APC64)    90  26  14
+  37941 ms  MIDIIN2 (APC64)    80  24   0
+  37963 ms  MIDIIN2 (APC64)    80  26   0
