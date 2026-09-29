@@ -1,5 +1,5 @@
 # APC64 Ruhezustands-Animation im Stil der MikroFX-Idle-Modi.
-# Encoder drücken = nächster Modus (PULS, WELLE, ATMEN, LAUFLICHT), Encoder drehen = Tempo, Shift = Dithering,
+# Encoder drücken = nächster Modus (PULS, AURORA, ATMEN, GLUEHWURM), Encoder drehen = Tempo, Shift = Dithering,
 # Pads = Reaktion, Stop-Taste = beenden (räumt LEDs und Display auf).
 # Live muss geschlossen sein.
 #   powershell -ExecutionPolicy Bypass -File C:\DEV\APC64\tools\apc_idle.ps1 [-Minutes 30]   (0 = bis Stop)

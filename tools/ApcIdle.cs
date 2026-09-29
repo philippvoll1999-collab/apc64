@@ -1,9 +1,14 @@
 using System; using System.Runtime.InteropServices; using System.Threading; using System.Text; using System.Collections.Generic;
 
-// Ruhezustands-Animation für das APC64 im Stil der MikroFX-Idle-Modi.
-// Encoder drücken = nächster Modus, Encoder drehen = Tempo, Shift = Dithering an/aus,
+// Organische Ruhezustands-Animation für das APC64.
+// Encoder drücken = nächster Modus, Encoder drehen = Tempo, Shift = Dithering an/aus (Standard: an,
+// wirkt nur bei PULS und GLUEHWURM),
 // Pads = Reaktion, Stop = beenden.
-// Helligkeit über den MIDI-Kanal: 0..6 = 10/25/50/65/75/90/100 % (wie APC mini mk2).
+//
+// Helligkeit: jede Farbe hat in der Palette eine helle, dunkle und sehr dunkle Variante
+// (z. B. 5/6/7 = #FF0000/#590000/#190000), der MIDI-Kanal 0..6 dimmt zusätzlich auf
+// 10/25/50/65/75/90/100 %. Zusammen ergibt das rund 20 Stufen, vor allem im dunklen Bereich.
+// Dithering wechselt zwischen zwei Nachbarstufen, versetzt pro Pad.
 public static class ApcIdle {
   [StructLayout(LayoutKind.Sequential)] struct HDR { public IntPtr data; public uint len, rec; public IntPtr user; public uint flags; public IntPtr next, res; public uint offset; [MarshalAs(UnmanagedType.ByValArray, SizeConst=8)] public IntPtr[] r2; }
   delegate void Cb(IntPtr h, uint msg, IntPtr inst, IntPtr p1, IntPtr p2);
@@ -18,27 +23,39 @@ public static class ApcIdle {
   [DllImport("winmm.dll")] static extern uint midiInStop(IntPtr h);
   [DllImport("winmm.dll")] static extern uint midiInClose(IntPtr h);
 
-  const int FULL = 6;                          // LED-Kanal für 100 %
-  static readonly double[] LEVELS = { 0.10, 0.25, 0.50, 0.65, 0.75, 0.90, 1.00 };   // Kanal 0..6
-  const int WHITE = 3;
+  const int FULL = 6;
   const int NOTE_ENC_PUSH = 90, NOTE_STOP = 93, NOTE_SHIFT = 120, CC_ENCODER = 90;
-  // Kräftige Palettenfarben nach Farbton sortiert (Werte aus der APC-mini-mk2-Palette)
-  static readonly int[] RAINBOW = { 5, 60, 9, 96, 13, 17, 21, 29, 33, 90, 37, 41, 79, 45, 80, 49, 81, 94, 53, 95, 57 };
-  static readonly int[] ROW_COLORS = { 9, 49, 37, 21 };   // orange, lila, cyan, grün (je 2 Reihen)
-  static readonly string[] NAMES = { "PULS", "WELLE", "ATMEN", "LAUFLICHT" };
+  static readonly double[] CHANNEL_LEVEL = { 0.10, 0.25, 0.50, 0.65, 0.75, 0.90, 1.00 };
+  static readonly double[] VARIANT_LEVEL = { 1.00, 0.35, 0.10 };   // helle / dunkle / sehr dunkle Palettenvariante
+  // Farbtöne mit drei Helligkeitsvarianten in der Palette (Index = helle Variante), nach Farbton sortiert
+  static readonly int[] HUES = { 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 57 };
+  static readonly string[] NAMES = { "PULS", "AURORA", "ATMEN", "GLUEHWURM" };
+  // Dithering nur, wo wenige Pads leuchten; bei vollflächigen Modi flackert es sichtbar.
+  static readonly bool[] MODE_DITHER = { true, false, false, true };
+  const double GAMMA = 2.0;
 
   static IntPtr outH, inH; static Cb keep;
   static readonly object lk = new object();
-  static readonly List<double[]> touches = new List<double[]>();   // {pad, zeit, farbe}
-  static int mode, nextColor; static double speed = 1.5, clock;
-  static volatile bool stop, textDirty = true, dither;
-  static int frame;
-  static readonly int[] sentColor = new int[64], sentCh = new int[64];
+  static readonly List<double[]> touches = new List<double[]>();   // {pad, zeit, farbton}
+  static int mode, frame; static double speed = 1.0, clock;
+  static volatile bool stop, textDirty = true, dither = true;
+  static readonly int[] sentVel = new int[64], sentCh = new int[64];
   static readonly int[] stripVal = new int[8], stripCol = new int[8];
   static DateTime t0;
+  static readonly Random rnd = new Random();
+
+  // Helligkeitsstufen: alle Kombinationen (Variante, Kanal) aufsteigend sortiert
+  static readonly List<double[]> steps = BuildSteps();
+  static List<double[]> BuildSteps() {
+    var l = new List<double[]>();
+    for (int v = 0; v < 3; v++) for (int c = 0; c < 7; c++) l.Add(new double[] { VARIANT_LEVEL[v] * CHANNEL_LEVEL[c], v, c });
+    l.Sort((a, b) => a[0].CompareTo(b[0]));
+    var dedup = new List<double[]>();
+    foreach (var s in l) if (dedup.Count == 0 || s[0] - dedup[dedup.Count - 1][0] > 0.004) dedup.Add(s);
+    return dedup;
+  }
 
   static double Now() { return (DateTime.Now - t0).TotalSeconds; }
-
   static void Short(int st, int d1, int d2) { midiOutShortMsg(outH, (uint)(st | ((d1 & 0x7F) << 8) | ((d2 & 0x7F) << 16))); }
 
   static void SysEx(byte[] msg) {
@@ -50,120 +67,136 @@ public static class ApcIdle {
     for (int i = 0; i < 100 && midiOutUnprepareHeader(outH, p, (uint)sz) == 65; i++) Thread.Sleep(1);
     Marshal.FreeHGlobal(p); Marshal.FreeHGlobal(buf);
   }
-
   static void Apc(int id, params byte[] payload) {
     var m = new List<byte> { 0xF0, 0x47, 0x00, 0x53, (byte)id, (byte)(payload.Length >> 7), (byte)(payload.Length & 0x7F) };
     m.AddRange(payload); m.Add(0xF7); SysEx(m.ToArray());
   }
-
-  static void Line(int n, string text) {
-    var p = new List<byte> { (byte)n }; p.AddRange(Encoding.ASCII.GetBytes(text)); p.Add(0); Apc(0x10, p.ToArray());
-  }
+  static void Line(int n, string text) { var p = new List<byte> { (byte)n }; p.AddRange(Encoding.ASCII.GetBytes(text)); p.Add(0); Apc(0x10, p.ToArray()); }
 
   static void OnInput(IntPtr h, uint msg, IntPtr inst, IntPtr p1, IntPtr p2) {
     if (msg != 0x3C3) return;
     uint d = (uint)p1.ToInt64(); int st = (int)(d & 0xFF), d1 = (int)((d >> 8) & 0x7F), d2 = (int)((d >> 16) & 0x7F);
     lock (lk) {
-      if (st == 0x96 && d2 > 0 && d1 < 64) {                     // Pad
-        nextColor = (nextColor + 4) % RAINBOW.Length;
-        touches.Add(new double[] { d1, Now(), RAINBOW[nextColor] });
-      } else if (st == 0x90 && d2 > 0 && d1 == NOTE_ENC_PUSH) {  // Encoder gedrückt: nächster Modus
-        mode = (mode + 1) % NAMES.Length; touches.Clear(); textDirty = true;
-      } else if (st == 0x90 && d2 > 0 && d1 == NOTE_SHIFT) {     // Shift: Dithering an/aus
-        dither = !dither; textDirty = true;
-      } else if (st == 0x90 && d2 > 0 && d1 == NOTE_STOP) {      // Stop: beenden
-        stop = true;
-      } else if (st == 0xB0 && d1 == CC_ENCODER) {               // Encoder: Tempo
-        speed = Math.Max(0.25, Math.Min(4, speed + (d2 < 64 ? 0.25 : -0.25))); textDirty = true;
-      }
+      if (st == 0x96 && d2 > 0 && d1 < 64) touches.Add(new double[] { d1, Now(), rnd.Next(HUES.Length) });
+      else if (st == 0x90 && d2 > 0 && d1 == NOTE_ENC_PUSH) { mode = (mode + 1) % NAMES.Length; touches.Clear(); textDirty = true; }
+      else if (st == 0x90 && d2 > 0 && d1 == NOTE_SHIFT) { dither = !dither; textDirty = true; }
+      else if (st == 0x90 && d2 > 0 && d1 == NOTE_STOP) stop = true;
+      else if (st == 0xB0 && d1 == CC_ENCODER) { speed = Math.Max(0.25, Math.Min(4, speed + (d2 < 64 ? 0.25 : -0.25))); textDirty = true; }
     }
   }
 
-  static double Crest(double dist, double width) {
-    dist = Math.Abs(dist); return dist >= width ? 0 : 0.5 + 0.5 * Math.Cos(Math.PI * dist / width);
+  // ---------- weiches Rauschen (Value Noise, 3D) ----------
+  static double Hash(int x, int y, int z) {
+    unchecked { int n = x * 374761393 + y * 668265263 + z * 1442695041; n = (n ^ (n >> 13)) * 1274126177; n ^= n >> 16; return (n & 0x7FFFFFFF) / (double)0x7FFFFFFF; }
   }
-  static double Breath(double phase, double lo) {
-    double v = 0.5 - 0.5 * Math.Cos(2 * Math.PI * phase); return lo + (1 - lo) * Math.Pow(v, 1.6);
+  static double Smooth(double t) { return t * t * (3 - 2 * t); }
+  static double Lerp(double a, double b, double t) { return a + (b - a) * t; }
+  static double Noise(double x, double y, double z) {
+    int xi = (int)Math.Floor(x), yi = (int)Math.Floor(y), zi = (int)Math.Floor(z);
+    double xf = Smooth(x - xi), yf = Smooth(y - yi), zf = Smooth(z - zi);
+    double a = Lerp(Lerp(Hash(xi, yi, zi), Hash(xi + 1, yi, zi), xf), Lerp(Hash(xi, yi + 1, zi), Hash(xi + 1, yi + 1, zi), xf), yf);
+    double b = Lerp(Lerp(Hash(xi, yi, zi + 1), Hash(xi + 1, yi, zi + 1), xf), Lerp(Hash(xi, yi + 1, zi + 1), Hash(xi + 1, yi + 1, zi + 1), xf), yf);
+    return Lerp(a, b, zf);
   }
-  static int Rainbow(double step) { int n = (int)Math.Floor(step) % RAINBOW.Length; return RAINBOW[n < 0 ? n + RAINBOW.Length : n]; }
-  static double Dist(int a, int b) { return Math.Sqrt(Math.Pow(a / 8 - b / 8, 2) + Math.Pow(a % 8 - b % 8, 2)); }
-  static int Snake(int step) { step = ((step % 64) + 64) % 64; int row = step / 8, col = step % 8; if (row % 2 == 1) col = 7 - col; return row * 8 + col; }
-  static int SnakeIndex(int pad) { int row = pad / 8, col = pad % 8; if (row % 2 == 1) col = 7 - col; return row * 8 + col; }
-  static double Corner(int pad, int corner) {
-    int r = pad / 8, c = pad % 8;
-    switch (corner) { case 1: return 14 - r - c; case 2: return r + 7 - c; case 3: return 7 - r + c; default: return r + c; }
-  }
+  static double Fbm(double x, double y, double z) { return Noise(x, y, z) * 0.65 + Noise(x * 2.1 + 7, y * 2.1 + 3, z * 1.7) * 0.35; }
+  static double Glow(double dist, double radius) { return Math.Exp(-(dist * dist) / (2 * radius * radius)); }
+  static int Hue(double h) { int n = (int)Math.Floor(h) % HUES.Length; return n < 0 ? n + HUES.Length : n; }
+  static double Dist(int p, double x, double y) { return Math.Sqrt(Math.Pow(p % 8 - x, 2) + Math.Pow(p / 8 - y, 2)); }
 
-  // Ein Bild berechnen: Farbe und Helligkeit (0..1) für 64 Pads, Wert (0..1) und Farbe für 8 Strips.
-  static void Render(double t, double now, int[] color, double[] level, double[] strip, int[] scol) {
+  // ---------- Modi ----------
+  static readonly List<double[]> drops = new List<double[]>();   // {x, y, geburt, farbton}
+  static double nextDrop;
+  static readonly double[][] flies = new double[6][];           // {x, y, farbton}
+
+  static void Render(double t, double now, int[] hue, double[] lvl) {
     int m; List<double[]> tc;
-    lock (lk) { m = mode; touches.RemoveAll(x => now - x[1] > (mode == 3 ? 5 : 1.2)); tc = new List<double[]>(touches); }
-    for (int p = 0; p < 64; p++) { color[p] = 0; level[p] = 0; }
-    if (m == 0) {                                   // PULS: Band von Ecke zu Ecke, jede Welle neue Farbe
-      int n = (int)Math.Floor(t / 2.4); double front = (t - n * 2.4) / 1.4 * 20 - 3;
-      int c = RAINBOW[(n * 5) % RAINBOW.Length];
-      for (int p = 0; p < 64; p++) { color[p] = c; level[p] = Crest(Corner(p, n % 4) - front, 3); }
-      bool right = n % 4 == 0 || n % 4 == 3;
-      for (int s = 0; s < 8; s++) { scol[s] = c; strip[s] = Crest((right ? s : 7 - s) * 2 - front, 4); }
-    } else if (m == 1) {                            // WELLE: Regenbogen mit rollendem Kamm
-      double hue = t * 0.5, front = (t * 3.5) % 24 - 5;
-      for (int p = 0; p < 64; p++) { int d = p / 8 + p % 8; color[p] = Rainbow(hue + d * 0.5); level[p] = 0.3 + 0.7 * Crest(d - front, 3.5); }
-      for (int s = 0; s < 8; s++) { scol[s] = Rainbow(hue + s); strip[s] = 0.5 + 0.5 * Math.Sin(t * 2 + s * 0.8); }
-    } else if (m == 2) {                            // ATMEN: Reihen pulsieren in Farben
-      for (int p = 0; p < 64; p++) { int r = p / 8; color[p] = ROW_COLORS[r / 2]; level[p] = Breath(t / 5 - r * 0.07, 0.2); }
-      for (int s = 0; s < 8; s++) { scol[s] = ROW_COLORS[s / 2]; strip[s] = Breath(t / 5 - s * 0.07, 0.1); }
-    } else {                                        // LAUFLICHT: Schlange mit Schweif, Strips als Knight Rider
-      double head = t * 12;
-      DrawRunner(color, level, head, Rainbow(head / 64 * 3));
-      double pos = t * 6 % 14; if (pos > 7) pos = 14 - pos;
-      for (int s = 0; s < 8; s++) { scol[s] = 5; strip[s] = Crest(s - pos, 2); }
-    }
-    foreach (var x in tc) {                         // Reaktionen auf Pads
-      int pad = (int)x[0]; double age = now - x[1]; int c = (int)x[2];
-      if (m == 3) { DrawRunner(color, level, SnakeIndex(pad) + age * 16, c); continue; }
-      double fade = 1 - age / 1.2;
+    lock (lk) { m = mode; touches.RemoveAll(x => now - x[1] > 2.5); tc = new List<double[]>(touches); }
+    for (int p = 0; p < 64; p++) { hue[p] = 0; lvl[p] = 0; }
+
+    if (m == 0) {                                   // PULS: Tropfen an zufälligen Stellen, weiche Ringe
+      if (t >= nextDrop) {
+        drops.Add(new double[] { rnd.NextDouble() * 7, rnd.NextDouble() * 7, t, rnd.Next(HUES.Length) });
+        nextDrop = t + 0.5 + rnd.NextDouble() * 1.4;
+      }
+      drops.RemoveAll(d => t - d[2] > 4 || t < d[2]);
+      foreach (var d in drops) {
+        double age = t - d[2], r = age * 2.6, fade = Math.Pow(1 - age / 4, 1.5);
+        for (int p = 0; p < 64; p++) {
+          double dist = Dist(p, d[0], d[1]);
+          double v = Glow(dist - r, 0.8) * fade + Glow(dist, 0.6) * Math.Max(0, 1 - age * 2);
+          if (v > lvl[p]) { lvl[p] = v; hue[p] = (int)d[3]; }
+        }
+      }
+    } else if (m == 1) {                            // AURORA: wabernde Farb- und Helligkeitswolken
       for (int p = 0; p < 64; p++) {
-        double v = Crest(Dist(p, pad) - age * 8, 1.6) * fade;
-        if (v > 0.35 && v > level[p]) { color[p] = m == 0 ? c : WHITE; level[p] = v; }
+        double x = p % 8, y = p / 8;
+        double b = Fbm(x * 0.28 + t * 0.10, y * 0.22 - t * 0.05, t * 0.18);
+        double h = Fbm(x * 0.12 - 3, y * 0.15 + t * 0.03, t * 0.06 + 11) * HUES.Length * 1.6 + t * 0.15;
+        hue[p] = Hue(h); lvl[p] = Math.Pow(Math.Max(0, b - 0.18) / 0.82, 1.3);
+      }
+    } else if (m == 2) {                            // ATMEN: jedes Pad atmet leicht versetzt, wie Glut
+      for (int p = 0; p < 64; p++) {
+        double x = p % 8, y = p / 8;
+        double phase = t * 0.22 + Noise(x * 0.35, y * 0.35, 5) * 1.3;
+        double breathe = 0.5 - 0.5 * Math.Cos(2 * Math.PI * phase);
+        double flicker = 0.85 + 0.15 * Noise(x * 1.3, y * 1.3, t * 1.5);
+        hue[p] = Hue(Noise(x * 0.2, y * 0.2, t * 0.02) * 4);    // warme Töne: rot bis gelb
+        lvl[p] = (0.08 + 0.92 * Math.Pow(breathe, 1.8)) * flicker;
+      }
+    } else {                                        // GLUEHWURM: schwebende Lichtpunkte
+      for (int i = 0; i < flies.Length; i++) {
+        if (flies[i] == null) flies[i] = new double[] { 0, 0, (i * 5) % HUES.Length };
+        flies[i][0] = 3.5 + 4.2 * (Noise(i * 13.1, 0.5, t * 0.12) - 0.5) * 2;
+        flies[i][1] = 3.5 + 4.2 * (Noise(i * 7.7, 9.5, t * 0.12) - 0.5) * 2;
+        double pulse = 0.55 + 0.45 * Math.Sin(t * 1.3 + i * 1.7);
+        for (int p = 0; p < 64; p++) {
+          double v = Glow(Dist(p, flies[i][0], flies[i][1]), 0.9) * pulse;
+          if (v > lvl[p]) { lvl[p] = v; hue[p] = (int)flies[i][2]; }
+        }
+      }
+    }
+
+    foreach (var x in tc) {                         // Pads: weicher Ring in zufälliger Farbe
+      int pad = (int)x[0]; double age = now - x[1], fade = Math.Pow(1 - age / 2.5, 2);
+      for (int p = 0; p < 64; p++) {
+        double dist = Dist(p, pad % 8, pad / 8);
+        double v = (Glow(dist - age * 4.5, 0.9) + Glow(dist, 0.7) * Math.Max(0, 1 - age * 3)) * fade;
+        if (v > lvl[p]) { lvl[p] = Math.Min(1, v); hue[p] = (int)x[2]; }
       }
     }
   }
 
-  static void DrawRunner(int[] color, double[] level, double head, int c) {
-    for (int step = 0; step < 64; step++) {
-      double behind = ((head - step) % 64 + 64) % 64;
-      double v = behind < 1 ? 1 : behind < 7 ? 1 - (behind - 1) / 6 : 0;
-      int p = Snake(step);
-      if (v > level[p]) { level[p] = v; color[p] = c; }
+  // Helligkeit 0..1 (mit Gamma) auf eine Stufe (Variante, Kanal) abbilden, mit Dithering dazwischen.
+  static void SetPad(int p, int hueIndex, double v) {
+    double target = Math.Pow(Math.Max(0, Math.Min(1, v)), GAMMA);
+    int vel = 0, ch = FULL;
+    if (target >= steps[0][0] * 0.5) {
+      int hi = 0; while (hi < steps.Count - 1 && steps[hi][0] < target) hi++;
+      int pick = hi;
+      if (hi > 0) {
+        double lo = steps[hi - 1][0], up = steps[hi][0], frac = Math.Min(1, (target - lo) / (up - lo));
+        if (dither && MODE_DITHER[mode]) pick = frac > ((frame * 0.618034 + p * 0.381966) % 1.0) ? hi : hi - 1;
+        else pick = frac < 0.5 ? hi - 1 : hi;
+      }
+      vel = HUES[hueIndex] + (int)steps[pick][1];
+      ch = (int)steps[pick][2];
     }
+    if (sentVel[p] == vel && sentCh[p] == ch) return;
+    sentVel[p] = vel; sentCh[p] = ch;
+    Short(0x90 | ch, p, vel);
   }
 
-  // Helligkeit 0..1 auf Kanal 0..6 abbilden; mit Dithering zwischen den zwei
-  // Nachbarstufen wechseln, versetzt pro Pad, damit es nicht im Takt flackert.
-  static int Channel(double v, int p) {
-    if (v < 0.06) return -1;
-    int hi = 0; while (hi < 6 && LEVELS[hi] < v) hi++;
-    if (hi == 0) return 0;
-    int lo = hi - 1;
-    double frac = (v - LEVELS[lo]) / (LEVELS[hi] - LEVELS[lo]);
-    if (!dither) return frac < 0.5 ? lo : hi;
-    double threshold = ((frame * 0.618034) + p * 0.381966) % 1.0;
-    return frac > threshold ? hi : lo;
-  }
-
-  static void SetPad(int p, int color, double v) {
-    int c = color, ch = Channel(v, p);
-    if (ch < 0) { c = 0; ch = FULL; }
-    if (sentColor[p] == c && sentCh[p] == ch) return;
-    sentColor[p] = c; sentCh[p] = ch;
-    Short(0x90 | ch, p, c);
-  }
-
-  static void SetStrip(int s, int color, double v) {
-    if (stripCol[s] != color) { stripCol[s] = color; Short(0xB0, 112 + s, color); }
-    int val = (int)(Math.Max(0, Math.Min(1, v)) * 16383);
-    if (Math.Abs(stripVal[s] - val) < 64) return;
-    stripVal[s] = val; Short(0xE0 | s, val & 0x7F, val >> 7);
+  // Strip = Energie der Pad-Spalte, in der Farbe des hellsten Pads der Spalte.
+  static void SetStrips(int[] hue, double[] lvl) {
+    for (int s = 0; s < 8; s++) {
+      double sum = 0, best = -1; int bh = 0;
+      for (int r = 0; r < 8; r++) { int p = r * 8 + s; sum += lvl[p]; if (lvl[p] > best) { best = lvl[p]; bh = hue[p]; } }
+      int color = HUES[bh];
+      if (stripCol[s] != color) { stripCol[s] = color; Short(0xB0, 112 + s, color); }
+      int val = (int)(Math.Min(1, sum / 3.0) * 16383);
+      if (Math.Abs(stripVal[s] - val) < 64) continue;
+      stripVal[s] = val; Short(0xE0 | s, val & 0x7F, val >> 7);
+    }
   }
 
   public static string Run(uint outId, uint inId, double minutes) {
@@ -171,26 +204,26 @@ public static class ApcIdle {
     keep = OnInput;
     if (midiInOpen(out inH, inId, keep, IntPtr.Zero, 0x30000) != 0) { midiOutClose(outH); return "Eingang belegt (Live offen?)"; }
     midiInStart(inH);
-    t0 = DateTime.Now; stop = false; mode = 0; textDirty = true;
-    for (int p = 0; p < 64; p++) { sentColor[p] = -1; sentCh[p] = -1; }
+    t0 = DateTime.Now; stop = false; mode = 0; textDirty = true; clock = 0; nextDrop = 0; drops.Clear();
+    for (int p = 0; p < 64; p++) { sentVel[p] = -1; sentCh[p] = -1; }
     for (int s = 0; s < 8; s++) { stripVal[s] = -999; stripCol[s] = -1; }
     try {
       SysEx(new byte[] { 0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7 });   // Identity: gibt das Display frei
       Thread.Sleep(300);
       Apc(0x1C, 1);
       for (int s = 0; s < 8; s++) Short(0xB0, 104 + s, 1);
-      var color = new int[64]; var level = new double[64]; var strip = new double[8]; var scol = new int[8];
+      var hue = new int[64]; var lvl = new double[64];
       double last = 0;
       while (!stop && (minutes <= 0 || Now() < minutes * 60)) {
         double now = Now(); double spd; lock (lk) spd = speed;
         clock += (now - last) * spd; last = now;
         if (textDirty) {
           textDirty = false; int m; lock (lk) m = mode;
-          Line(0, dither ? "APC64 DITHER" : "APC64"); Line(1, NAMES[m]); Line(2, string.Format("Tempo {0:0.00}x", spd));
+          Line(0, dither && MODE_DITHER[m] ? "APC64 DITHER" : "APC64"); Line(1, NAMES[m]); Line(2, string.Format("Tempo {0:0.00}x", spd));
         }
-        Render(clock, now, color, level, strip, scol);
-        for (int p = 0; p < 64; p++) SetPad(p, color[p], level[p]);
-        for (int s = 0; s < 8; s++) SetStrip(s, scol[s], strip[s]);
+        Render(clock, now, hue, lvl);
+        for (int p = 0; p < 64; p++) SetPad(p, hue[p], lvl[p]);
+        SetStrips(hue, lvl);
         frame++;
         Thread.Sleep(15);
       }
