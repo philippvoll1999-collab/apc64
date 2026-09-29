@@ -1,8 +1,8 @@
 using System; using System.Runtime.InteropServices; using System.Threading; using System.Text; using System.Collections.Generic;
 
 // Organische Ruhezustands-Animation für das APC64.
-// Encoder drücken = nächster Modus, Encoder drehen = Tempo, Shift = Dithering an/aus (Standard: an,
-// wirkt nur bei PULS),
+// Encoder drücken = nächster Modus, Encoder drehen = Tempo, Shift = Dithering an/aus (Standard: aus,
+// zum Ausprobieren),
 // Pads = Reaktion, Stop = beenden.
 //
 // Helligkeit: jede Farbe hat in der Palette eine helle, dunkle und sehr dunkle Variante
@@ -31,7 +31,8 @@ public static class ApcIdle {
   static readonly int[] HUES = { 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 57 };
   static readonly string[] NAMES = { "PULS", "AURORA", "ATMEN", "GLUEHWURM" };
   // Dithering nur, wo wenige Pads leuchten; bei vollflächigen Modi flackert es sichtbar.
-  static readonly bool[] MODE_DITHER = { true, false, false, false };
+  static readonly bool[] MODE_DITHER = { true, true, true, true };   // nur wirksam, wenn Shift es einschaltet
+  static readonly bool[] MODE_FINE = { true, true, true, false };    // feine Leiter; GLUEHWURM nutzt die gleichmäßige
   const double GAMMA = 2.0;
   const double AURORA_LO = 4, AURORA_HI = 13;   // HUES-Index: grün (21) bis pink (57)
 
@@ -39,7 +40,7 @@ public static class ApcIdle {
   static readonly object lk = new object();
   static readonly List<double[]> touches = new List<double[]>();   // {pad, zeit, farbton}
   static int mode, frame; static double speed = 1.0, clock;
-  static volatile bool stop, textDirty = true, dither = true;
+  static volatile bool stop, textDirty = true, dither = false;
   static readonly int[] sentVel = new int[64], sentCh = new int[64];
   static readonly int[] curPick = new int[64], curHue = new int[64];   // für Hysterese
   static readonly double[] smooth = new double[64];                      // geglättete Helligkeit
@@ -48,8 +49,20 @@ public static class ApcIdle {
   static DateTime t0;
   static readonly Random rnd = new Random();
 
-  // Helligkeitsstufen: alle Kombinationen (Variante, Kanal) aufsteigend sortiert
-  static readonly List<double[]> steps = BuildSteps();
+  // Zwei Helligkeitsleitern (je Einträge {helligkeit, variante, kanal}):
+  // - gleichmäßig: dunkle Variante nur fürs Ausklingen, darüber helle Variante x 7 Kanäle
+  // - fein: alle Kombinationen, ausgedünnt auf mindestens 12 % Abstand, damit es in der Mitte
+  //   genug Zwischenstufen gibt, aber keine Fast-Duplikate, zwischen denen Pads springen
+  static readonly List<double[]> evenSteps = BuildSteps();
+  static readonly List<double[]> fineSteps = BuildFineSteps();
+  static List<double[]> BuildFineSteps() {
+    var l = new List<double[]>();
+    for (int v = 0; v < 3; v++) for (int c = 0; c < 7; c++) l.Add(new double[] { VARIANT_LEVEL[v] * CHANNEL_LEVEL[c], v, c });
+    l.Sort((a, b) => a[0].CompareTo(b[0]));
+    var kept = new List<double[]>();
+    foreach (var x in l) if (kept.Count == 0 || x[0] >= kept[kept.Count - 1][0] * 1.12) kept.Add(x);
+    return kept;
+  }
   // Gleichmäßige Leiter: die sehr dunkle Variante nur fürs schwache Ausklingen, darüber
   // durchgehend die helle Variante mit den 7 Kanälen. Ständiges Wechseln zwischen den
   // Varianten sieht wie Zittern aus, weil sie nicht exakt gleich getönt sind.
@@ -83,7 +96,7 @@ public static class ApcIdle {
     uint d = (uint)p1.ToInt64(); int st = (int)(d & 0xFF), d1 = (int)((d >> 8) & 0x7F), d2 = (int)((d >> 16) & 0x7F);
     lock (lk) {
       if (st == 0x96 && d2 > 0 && d1 < 64) touches.Add(new double[] { d1, Now(), rnd.Next(HUES.Length) });
-      else if (st == 0x90 && d2 > 0 && d1 == NOTE_ENC_PUSH) { mode = (mode + 1) % NAMES.Length; touches.Clear(); textDirty = true; }
+      else if (st == 0x90 && d2 > 0 && d1 == NOTE_ENC_PUSH) { mode = (mode + 1) % NAMES.Length; touches.Clear(); textDirty = true; Array.Clear(curPick, 0, 64); }
       else if (st == 0x90 && d2 > 0 && d1 == NOTE_SHIFT) { dither = !dither; textDirty = true; }
       else if (st == 0x90 && d2 > 0 && d1 == NOTE_STOP) stop = true;
       else if (st == 0xB0 && d1 == CC_ENCODER) { speed = Math.Max(0.25, Math.Min(4, speed + (d2 < 64 ? 0.25 : -0.25))); textDirty = true; }
@@ -188,6 +201,7 @@ public static class ApcIdle {
     curHue[p] = hueIndex;
 
     double target = Math.Pow(Math.Max(0, Math.Min(1, v)), GAMMA);
+    var steps = MODE_FINE[mode] ? fineSteps : evenSteps;
     int vel = 0, ch = FULL;
     if (target >= steps[0][0] * 0.5) {
       int hi = 0; while (hi < steps.Count - 1 && steps[hi][0] < target) hi++;
@@ -244,7 +258,7 @@ public static class ApcIdle {
         clock += (now - last) * spd; last = now;
         if (textDirty) {
           textDirty = false; int m; lock (lk) m = mode;
-          Line(0, dither && MODE_DITHER[m] ? "APC64 DITHER" : "APC64"); Line(1, NAMES[m]); Line(2, string.Format("Tempo {0:0.00}x", spd));
+          Line(0, dither ? "APC64 DITHER" : "APC64"); Line(1, NAMES[m]); Line(2, string.Format("Tempo {0:0.00}x", spd));
         }
         Render(clock, now, hue, lvl);
         for (int p = 0; p < 64; p++) {
