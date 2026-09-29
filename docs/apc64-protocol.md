@@ -5,8 +5,11 @@ Stand: 29.09.2026. Quelle: Lives eigenes APC64-Script (dekompiliert in [gluon/Ab
 ## Geprüft am Gerät (29.09.2026, `tools/apc_probe.ps1`)
 
 - **Identity:** Antwort auf `F0 7E 7F 06 01 F7` enthält `47 53 00 19` und die Firmware-Kennung `01 02 01 06`, danach die Seriennummer als ASCII (nicht im Repo).
+- **Wichtig: Erst Identity, dann Display.** Nach dem Einschalten ignoriert das APC64 alle Display-Befehle (Pads gehen trotzdem), bis ein Programm den Universal Identity Request `F0 7E 7F 06 01 F7` geschickt hat. Lives Script macht das beim Verbinden genauso.
 - **Funktioniert sichtbar:** Display mit 3 Zeilen (nach Besitz-Übernahme `1C 01`), Header-Farbe über Note 89, Pad-Farben per Velocity, LED-Modi per Kanal (voll, halb, pulsierend, blinkend), Touch-Strip-LEDs mit Stil, Farbe und Wert per Pitch Bend. Aufräumen und Rückgabe des Displays mit `1C 00` klappen.
-- **Noch offen:** Länge und Abschneiden der Displayzeilen, Eingaben mitschneiden (Pad-Velocity/Aftertouch, Strip-Auflösung, Encoder), Werte für den Firmware-Modus `19`.
+- **Display:** Alle Buchstaben inkl. Kleinbuchstaben und ASCII-Sonderzeichen werden richtig dargestellt. Zähler mit ca. 30 Updates/s läuft flüssig.
+- **Header-Farbe über Note 89** hat auf den Kanälen 1, 2, 7 und 16 **nicht** reagiert. Weg noch unbekannt.
+- **Noch offen:** maximale Zeilenlänge, Header-Farbe, Eingaben mitschneiden (Pad-Velocity/Aftertouch, Strip-Auflösung, Encoder), Werte für den Firmware-Modus `19`.
 
 ## SysEx
 

@@ -18,6 +18,8 @@ function Header([int]$color) { [Midi]::Short(0x96, 89, $color) }
 function Step($t) { Write-Output ("[{0:HH:mm:ss}] {1}" -f (Get-Date), $t) }
 
 try {
+    # Ohne Identity-Abfrage ignoriert das APC64 nach dem Einschalten alle Display-Befehle.
+    [void][Midi]::Request([byte[]]@(0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7), 800)
     [Midi]::Send((Sx 0x1C ([byte[]]@(1))))
     Header 3
 
