@@ -2,6 +2,12 @@
 
 Stand: 29.09.2026. Quelle: Lives eigenes APC64-Script (dekompiliert in [gluon/AbletonLive12_MIDIRemoteScripts/APC64](https://github.com/gluon/AbletonLive12_MIDIRemoteScripts/tree/main/APC64): `midi.py`, `elements.py`, `display.py`, `touch_strip.py`, `colors.py`). Was nicht als **geprüft** markiert ist, muss am Gerät bestätigt werden.
 
+## Geprüft am Gerät (29.09.2026, `tools/apc_probe.ps1`)
+
+- **Identity:** Antwort auf `F0 7E 7F 06 01 F7` enthält `47 53 00 19` und die Firmware-Kennung `01 02 01 06`, danach die Seriennummer als ASCII (nicht im Repo).
+- **Funktioniert sichtbar:** Display mit 3 Zeilen (nach Besitz-Übernahme `1C 01`), Header-Farbe über Note 89, Pad-Farben per Velocity, LED-Modi per Kanal (voll, halb, pulsierend, blinkend), Touch-Strip-LEDs mit Stil, Farbe und Wert per Pitch Bend. Aufräumen und Rückgabe des Displays mit `1C 00` klappen.
+- **Noch offen:** Länge und Abschneiden der Displayzeilen, Eingaben mitschneiden (Pad-Velocity/Aftertouch, Strip-Auflösung, Encoder), Werte für den Firmware-Modus `19`.
+
 ## SysEx
 
 ```
