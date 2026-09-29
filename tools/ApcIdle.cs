@@ -1,7 +1,7 @@
 using System; using System.Runtime.InteropServices; using System.Threading; using System.Text; using System.Collections.Generic;
 
 // Ruhezustands-Animation für das APC64 im Stil der MikroFX-Idle-Modi.
-// Shift = nächster Modus, Encoder = Tempo, Pads = Reaktion, Stop = beenden.
+// Encoder drücken = nächster Modus, Encoder drehen = Tempo, Pads = Reaktion, Stop = beenden.
 public static class ApcIdle {
   [StructLayout(LayoutKind.Sequential)] struct HDR { public IntPtr data; public uint len, rec; public IntPtr user; public uint flags; public IntPtr next, res; public uint offset; [MarshalAs(UnmanagedType.ByValArray, SizeConst=8)] public IntPtr[] r2; }
   delegate void Cb(IntPtr h, uint msg, IntPtr inst, IntPtr p1, IntPtr p2);
@@ -18,7 +18,7 @@ public static class ApcIdle {
 
   const int FULL = 6, HALF = 0;               // LED-Kanäle: volle / halbe Helligkeit
   const int WHITE = 3;
-  const int NOTE_SHIFT = 120, NOTE_STOP = 93, CC_ENCODER = 90;
+  const int NOTE_ENC_PUSH = 90, NOTE_STOP = 93, CC_ENCODER = 90;
   static readonly int[] RAINBOW = { 5, 9, 13, 17, 21, 29, 33, 37, 41, 45, 49, 53, 57 };
   static readonly int[] ROW_COLORS = { 9, 49, 37, 21 };   // orange, lila, cyan, grün (je 2 Reihen)
   static readonly string[] NAMES = { "PULS", "WELLE", "ATMEN", "LAUFLICHT" };
@@ -62,7 +62,7 @@ public static class ApcIdle {
       if (st == 0x96 && d2 > 0 && d1 < 64) {                     // Pad
         nextColor = (nextColor + 4) % RAINBOW.Length;
         touches.Add(new double[] { d1, Now(), RAINBOW[nextColor] });
-      } else if (st == 0x90 && d2 > 0 && d1 == NOTE_SHIFT) {     // Shift: nächster Modus
+      } else if (st == 0x90 && d2 > 0 && d1 == NOTE_ENC_PUSH) {  // Encoder gedrückt: nächster Modus
         mode = (mode + 1) % NAMES.Length; touches.Clear(); textDirty = true;
       } else if (st == 0x90 && d2 > 0 && d1 == NOTE_STOP) {      // Stop: beenden
         stop = true;
@@ -159,7 +159,6 @@ public static class ApcIdle {
       SysEx(new byte[] { 0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7 });   // Identity: gibt das Display frei
       Thread.Sleep(300);
       Apc(0x1C, 1);
-      Short(0x90 | FULL, NOTE_SHIFT, 1);                            // Shift leuchtet als Hinweis
       for (int s = 0; s < 8; s++) Short(0xB0, 104 + s, 1);
       var color = new int[64]; var level = new double[64]; var strip = new double[8]; var scol = new int[8];
       double last = 0;
@@ -178,7 +177,6 @@ public static class ApcIdle {
       return stop ? "Mit Stop beendet" : "Zeit abgelaufen";
     } finally {
       for (int p = 0; p < 64; p++) { Short(0x90 | FULL, p, 0); Short(0x90 | HALF, p, 0); }
-      Short(0x90 | FULL, NOTE_SHIFT, 0);
       for (int s = 0; s < 8; s++) { Short(0xB0, 104 + s, 0); Short(0xE0 | s, 0, 0); }
       Line(0, ""); Line(1, ""); Line(2, ""); Apc(0x1C, 0);
       midiInStop(inH); midiInClose(inH); midiOutClose(outH);
