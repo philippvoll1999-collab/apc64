@@ -162,7 +162,8 @@ public static class ApcIdle {
     } else if (m == 2) {                            // ATMEN: jedes Pad atmet leicht versetzt, wie Glut
       for (int p = 0; p < 64; p++) {
         double x = p % 8, y = p / 8;
-        double phase = t * 0.125 + Noise(x * 0.35, y * 0.35, 5) * 1.3;   // ein Atemzug ca. 8 s
+        double period = 4.0 + 0.5 * Noise(x * 0.6, y * 0.6, 9);          // pro Pad 4 bis 4,5 s
+        double phase = t / period + Noise(x * 0.35, y * 0.35, 5) * 1.3;
         double breathe = 0.5 - 0.5 * Math.Cos(2 * Math.PI * phase);
         hue[p] = Noise(x * 0.25, y * 0.25, 1) * 3.2;             // feste warme Töne: rot bis gelb
         lvl[p] = 0.08 + 0.92 * Math.Pow(breathe, 1.8);
