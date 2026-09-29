@@ -1,4 +1,4 @@
-# APC64 Display-Test 2: Zeilenlänge per Lineal, Header-Farbe auf verschiedenen Kanälen.
+# APC64 Display-Test 2: Zeilenlänge per Lineal.
 #   powershell -ExecutionPolicy Bypass -File C:\DEV\APC64\tools\apc_display2.ps1
 param([string]$Port = "APC64", [int]$Hold = 10)
 
@@ -24,16 +24,10 @@ try {
     Step "Lineal: Welches Zeichen ist pro Zeile das letzte sichtbare? ($Hold s)"
     Start-Sleep $Hold
 
-    # Header-Farbe: Note 89 auf verschiedenen Kanälen, jeweils rot -> grün -> blau
-    foreach ($ch in 0, 1, 6, 15) {
-        Lines "HEADER" ("Kanal " + ($ch + 1)) ""
-        Step ("Header-Farbe: Note 89 auf Kanal " + ($ch + 1) + " (rot, gruen, blau je 1 s)")
-        foreach ($c in 5, 21, 45) { Line 2 ("Farbe " + $c); [Midi]::Short(0x90 -bor $ch, 89, $c); Start-Sleep 1 }
-        [Midi]::Short(0x90 -bor $ch, 89, 0)
-    }
+    # Der fruehere Header-Test (Note 89 auf Kanal 1/2/7/16) sperrt das Display bis zum
+    # Aus- und Einschalten des APC64 und ist deshalb entfernt.
 }
 finally {
-    foreach ($ch in 0, 1, 6, 15) { [Midi]::Short(0x90 -bor $ch, 89, 0) }
     Lines "" "" ""
     [Midi]::Send((Sx 0x1C ([byte[]]@(0))))
     Step "Display an das Geraet zurueckgegeben"

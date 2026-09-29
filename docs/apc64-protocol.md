@@ -8,8 +8,10 @@ Stand: 29.09.2026. Quelle: Lives eigenes APC64-Script (dekompiliert in [gluon/Ab
 - **Wichtig: Erst Identity, dann Display.** Nach dem Einschalten ignoriert das APC64 alle Display-Befehle (Pads gehen trotzdem), bis ein Programm den Universal Identity Request `F0 7E 7F 06 01 F7` geschickt hat. Lives Script macht das beim Verbinden genauso.
 - **Funktioniert sichtbar:** Display mit 3 Zeilen (nach Besitz-Übernahme `1C 01`), Pad-Farben per Velocity, LED-Modi per Kanal (voll, halb, pulsierend, blinkend), Touch-Strip-LEDs mit Stil, Farbe und Wert per Pitch Bend. Aufräumen und Rückgabe des Displays mit `1C 00` klappen.
 - **Display:** Alle Buchstaben inkl. Kleinbuchstaben und ASCII-Sonderzeichen werden richtig dargestellt. Zähler mit ca. 30 Updates/s läuft flüssig.
-- **Header-Farbe über Note 89** hat auf den Kanälen 1, 2, 7 und 16 **nicht** reagiert. Weg noch unbekannt.
-- **Noch offen:** maximale Zeilenlänge, Header-Farbe, Eingaben mitschneiden (Pad-Velocity/Aftertouch, Strip-Auflösung, Encoder), Werte für den Firmware-Modus `19`.
+- **Zeilenbreite:** Proportionale Schrift, Text wird **zentriert** und links und rechts abgeschnitten. Bei 20 Zeichen sichtbar: Zeile 1 `E`–`P` (12 Großbuchstaben), Zeile 2 `c`–`q` (15 Kleinbuchstaben), Zeile 3 `4`–`F` (12 Ziffern/Großbuchstaben). Faustregel: ca. 12 Zeichen, bei Kleinbuchstaben etwas mehr.
+- **Header-Farbe über Note 89** hat auf den Kanälen 1, 2, 7 und 16 **nicht** reagiert. **Achtung:** Dieser Test (Note On 89 auf Kanal 1, 2, 7 und 16 mit Note Off) hat das Display danach gesperrt, bis das APC64 aus- und wieder eingeschaltet wurde. Pads funktionierten weiter. Welche Nachricht genau schuld ist, ist offen. Bis dahin Note 89 außer auf Kanal 7 nicht senden.
+- **Wiederholbarkeit:** Ohne den Header-Test funktioniert das Display auch bei mehreren Läufen hintereinander, jeweils mit Identity-Abfrage vorweg.
+- **Noch offen:** Header-Farbe (welche Nachricht sperrt das Display?), Eingaben mitschneiden (Pad-Velocity/Aftertouch, Strip-Auflösung, Encoder), Werte für den Firmware-Modus `19`.
 
 ## SysEx
 
