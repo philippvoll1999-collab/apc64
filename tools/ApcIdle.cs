@@ -33,7 +33,7 @@ public static class ApcIdle {
   // Dithering nur, wo wenige Pads leuchten; bei vollflächigen Modi flackert es sichtbar.
   static readonly bool[] MODE_DITHER = { true, false, false, true };
   const double GAMMA = 2.0;
-  const double AURORA_LO = 4, AURORA_HI = 11;   // HUES-Index: grün (21) bis violett (49)
+  const double AURORA_LO = 4, AURORA_HI = 13;   // HUES-Index: grün (21) bis pink (57)
 
   static IntPtr outH, inH; static Cb keep;
   static readonly object lk = new object();
@@ -131,7 +131,7 @@ public static class ApcIdle {
         }
       }
     } else if (m == 1) {                            // AURORA: wabernde Farb- und Helligkeitswolken
-      // Polarlicht: Farbverlauf grün (unten) -> türkis -> cyan -> blau -> violett (oben),
+      // Polarlicht: Farbverlauf grün (unten) -> türkis -> cyan -> blau -> violett -> magenta/pink (oben),
       // senkrechte Vorhänge, die langsam seitlich wandern.
       for (int p = 0; p < 64; p++) {
         double x = p % 8, y = p / 8;
@@ -139,7 +139,8 @@ public static class ApcIdle {
         double body = 0.55 + 0.45 * Noise(x * 0.15 + 20, y * 0.25, t * 0.05);
         double b = Math.Max(0, curtain - 0.22) / 0.78 * body;
         double drift = (Noise(x * 0.1 + 40, 3, t * 0.04) - 0.5) * 1.6;
-        hue[p] = AURORA_LO + (y / 7.0) * (AURORA_HI - AURORA_LO) + drift;
+        double h = AURORA_LO + Math.Pow(y / 7.0, 1.35) * (AURORA_HI - AURORA_LO) + drift;
+        hue[p] = Math.Max(AURORA_LO, Math.Min(AURORA_HI, h));   // nicht über Pink hinaus in Rot laufen
         lvl[p] = Math.Pow(b, 1.15);
       }
     } else if (m == 2) {                            // ATMEN: jedes Pad atmet leicht versetzt, wie Glut
