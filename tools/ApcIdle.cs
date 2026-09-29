@@ -53,13 +53,15 @@ public static class ApcIdle {
 
   // Zwei Helligkeitsleitern (je Einträge {helligkeit, variante, kanal}):
   // - gleichmäßig: dunkle Variante nur fürs Ausklingen, darüber helle Variante x 7 Kanäle
-  // - fein: alle Kombinationen, ausgedünnt auf mindestens 12 % Abstand, damit es in der Mitte
+  // - fein: helle und dunkle Variante x 7 Kanäle, ausgedünnt auf mindestens 6 % Abstand, damit es in der Mitte
   //   genug Zwischenstufen gibt, aber keine Fast-Duplikate, zwischen denen Pads springen
   static readonly List<double[]> evenSteps = BuildSteps();
   static readonly List<double[]> fineSteps = BuildFineSteps();
   static List<double[]> BuildFineSteps() {
     var l = new List<double[]>();
-    for (int v = 0; v < 3; v++) for (int c = 0; c < 7; c++) l.Add(new double[] { VARIANT_LEVEL[v] * CHANNEL_LEVEL[c], v, c });
+    // Nur helle und dunkle Variante: die dunkle ist exakt die helle mit 35 %. Die sehr dunkle ist
+    // bei manchen Farben anders getönt (Orange 11 = #271B00 statt #190800) und lässt die Farbe springen.
+    for (int v = 0; v < 2; v++) for (int c = 0; c < 7; c++) l.Add(new double[] { VARIANT_LEVEL[v] * CHANNEL_LEVEL[c], v, c });
     l.Sort((a, b) => a[0].CompareTo(b[0]));
     var kept = new List<double[]>();
     foreach (var x in l) if (kept.Count == 0 || x[0] >= kept[kept.Count - 1][0] * 1.06) kept.Add(x);
@@ -164,7 +166,7 @@ public static class ApcIdle {
     } else if (m == 2) {                            // ATMEN: jedes Pad atmet leicht versetzt, wie Glut
       for (int p = 0; p < 64; p++) {
         double x = p % 8, y = p / 8;
-        double period = 4.0 + 0.5 * Noise(x * 0.6, y * 0.6, 9);          // pro Pad 4 bis 4,5 s
+        const double period = 4.25;                                        // ein Atemzug, für alle Pads gleich
         double phase = t / period + Noise(x * 0.35, y * 0.35, 5) * 1.3;
         double breathe = 0.5 - 0.5 * Math.Cos(2 * Math.PI * phase);   // reine Sinuswelle
         hue[p] = Noise(x * 0.25, y * 0.25, 1) * 3.2;             // feste warme Töne: rot bis gelb
