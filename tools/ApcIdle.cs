@@ -42,7 +42,7 @@ public static class ApcIdle {
   static readonly object lk = new object();
   static readonly List<double[]> touches = new List<double[]>();   // {pad, zeit, farbton}
   static int mode, frame; static double speed = 1.0, clock;
-  static volatile bool stop, textDirty = true, dither = false;
+  static volatile bool stop, textDirty = true, dither = false, paused, wake;
   static readonly int[] sentVel = new int[64], sentCh = new int[64];
   static readonly int[] curPick = new int[64], curHue = new int[64];   // für Hysterese
   static readonly double[] smooth = new double[64];                      // geglättete Helligkeit
@@ -101,6 +101,7 @@ public static class ApcIdle {
     if (msg != 0x3C3) return;
     uint d = (uint)p1.ToInt64(); int st = (int)(d & 0xFF), d1 = (int)((d >> 8) & 0x7F), d2 = (int)((d >> 16) & 0x7F);
     lock (lk) {
+      if (paused) { if ((st == 0x96 && d2 > 0 && d1 < 64) || (st == 0x90 && d2 > 0 && d1 == NOTE_ENC_PUSH)) wake = true; return; }
       if (st == 0x96 && d2 > 0 && d1 < 64) touches.Add(new double[] { d1, Now(), rnd.Next(HUES.Length) });
       else if (st == 0x90 && d2 > 0 && d1 == NOTE_ENC_PUSH) { mode = (mode + 1) % NAMES.Length; touches.Clear(); textDirty = true; Array.Clear(curPick, 0, 64); }
       else if (st == 0x90 && d2 > 0 && d1 == NOTE_SHIFT) { dither = !dither; textDirty = true; }
@@ -245,12 +246,28 @@ public static class ApcIdle {
     }
   }
 
-  public static string Run(uint outId, uint inId, double minutes) {
+  static bool LiveRunning() {
+    foreach (var pr in System.Diagnostics.Process.GetProcesses()) if (pr.ProcessName.StartsWith("Ableton Live")) return true;
+    return false;
+  }
+
+  static void ClearAll() {
+    for (int p = 0; p < 64; p++) Short(0x90 | FULL, p, 0);
+    for (int s = 0; s < 8; s++) { Short(0xB0, 104 + s, 0); Short(0xE0 | s, 0, 0); }
+    Line(0, ""); Line(1, ""); Line(2, ""); Apc(0x1C, 0);
+  }
+
+  public static string Run(uint outId, uint inId, double minutes) { return Run(outId, inId, minutes, false); }
+
+  // service = true: Stop pausiert (Pad oder Encoder-Druck weckt), und sobald Live startet,
+  // wird das APC64 sofort freigegeben, ohne Lichter zu löschen (Live zeichnet selbst).
+  public static string Run(uint outId, uint inId, double minutes, bool service) {
     if (midiOutOpen(out outH, outId, IntPtr.Zero, IntPtr.Zero, 0) != 0) return "Ausgang belegt (Live offen?)";
     keep = OnInput;
     if (midiInOpen(out inH, inId, keep, IntPtr.Zero, 0x30000) != 0) { midiOutClose(outH); return "Eingang belegt (Live offen?)"; }
     midiInStart(inH);
-    t0 = DateTime.Now; stop = false; mode = 0; textDirty = true; clock = 0; nextDrop = 0; drops.Clear();
+    t0 = DateTime.Now; stop = false; paused = false; wake = false; mode = 0; textDirty = true; clock = 0; nextDrop = 0; drops.Clear();
+    bool liveStarted = false;
     for (int p = 0; p < 64; p++) { sentVel[p] = -1; sentCh[p] = -1; curPick[p] = 0; curHue[p] = 0; smooth[p] = 0; }
     for (int s = 0; s < 8; s++) { stripVal[s] = -999; stripCol[s] = -1; }
     try {
@@ -260,7 +277,19 @@ public static class ApcIdle {
       for (int s = 0; s < 8; s++) Short(0xB0, 104 + s, 1);
       var hue = new double[64]; var lvl = new double[64];
       double last = 0;
-      while (!stop && (minutes <= 0 || Now() < minutes * 60)) {
+      while (minutes <= 0 || Now() < minutes * 60) {
+        if (service && frame % 15 == 0 && LiveRunning()) { liveStarted = true; break; }
+        if (stop) {
+          if (!service) break;
+          ClearAll(); stop = false; paused = true; wake = false;
+        }
+        if (paused) {
+          if (wake) {
+            paused = false; wake = false; textDirty = true;
+            Apc(0x1C, 1); for (int s = 0; s < 8; s++) { Short(0xB0, 104 + s, 1); stripVal[s] = -999; stripCol[s] = -1; }
+            for (int p = 0; p < 64; p++) { sentVel[p] = -1; sentCh[p] = -1; }
+          } else { frame++; Thread.Sleep(15); continue; }
+        }
         double now = Now(); double spd; lock (lk) spd = speed;
         clock += (now - last) * spd; last = now;
         if (textDirty) {
@@ -276,11 +305,9 @@ public static class ApcIdle {
         frame++;
         Thread.Sleep(15);
       }
-      return stop ? "Mit Stop beendet" : "Zeit abgelaufen";
+      return liveStarted ? "Live gestartet, APC64 freigegeben" : stop ? "Mit Stop beendet" : "Zeit abgelaufen";
     } finally {
-      for (int p = 0; p < 64; p++) Short(0x90 | FULL, p, 0);
-      for (int s = 0; s < 8; s++) { Short(0xB0, 104 + s, 0); Short(0xE0 | s, 0, 0); }
-      Line(0, ""); Line(1, ""); Line(2, ""); Apc(0x1C, 0);
+      if (!liveStarted && !paused) ClearAll();
       midiInStop(inH); midiInClose(inH); midiOutClose(outH);
     }
   }
