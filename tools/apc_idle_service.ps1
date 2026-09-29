@@ -22,6 +22,14 @@ try {
         $outId = ([Midi]::Outs("APC64") | Where-Object { $_.Value -eq "APC64" }).Key
         $inId  = ([Midi]::Ins("APC64")  | Where-Object { $_.Value -eq "APC64" }).Key
         if ($null -eq $outId -or $null -eq $inId) { Start-Sleep 10; continue }
+        # Direkt nach dem Hochfahren meldet Windows den Port schon, das APC64 (oder der
+        # MIDI-Dienst) hört aber noch nicht zu. Erst starten, wenn es auf Identity antwortet.
+        $ready = $false
+        if ([Midi]::Open($outId, $inId)) {
+            $ready = $null -ne [Midi]::Request([byte[]]@(0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7), 1500)
+            [Midi]::Close()
+        }
+        if (-not $ready) { Log "APC64 antwortet noch nicht, neuer Versuch in 5 s"; Start-Sleep 5; continue }
         Log "Animation startet"
         $result = [ApcIdle]::Run($outId, $inId, 0, $true)
         Log $result
