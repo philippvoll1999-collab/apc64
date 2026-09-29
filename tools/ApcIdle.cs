@@ -2,7 +2,7 @@ using System; using System.Runtime.InteropServices; using System.Threading; usin
 
 // Organische Ruhezustands-Animation für das APC64.
 // Encoder drücken = nächster Modus, Encoder drehen = Tempo, Shift = Dithering an/aus (Standard: an,
-// wirkt nur bei PULS und GLUEHWURM),
+// wirkt nur bei PULS),
 // Pads = Reaktion, Stop = beenden.
 //
 // Helligkeit: jede Farbe hat in der Palette eine helle, dunkle und sehr dunkle Variante
@@ -31,7 +31,7 @@ public static class ApcIdle {
   static readonly int[] HUES = { 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 57 };
   static readonly string[] NAMES = { "PULS", "AURORA", "ATMEN", "GLUEHWURM" };
   // Dithering nur, wo wenige Pads leuchten; bei vollflächigen Modi flackert es sichtbar.
-  static readonly bool[] MODE_DITHER = { true, false, false, true };
+  static readonly bool[] MODE_DITHER = { true, false, false, false };
   const double GAMMA = 2.0;
   const double AURORA_LO = 4, AURORA_HI = 13;   // HUES-Index: grün (21) bis pink (57)
 
@@ -42,19 +42,22 @@ public static class ApcIdle {
   static volatile bool stop, textDirty = true, dither = true;
   static readonly int[] sentVel = new int[64], sentCh = new int[64];
   static readonly int[] curPick = new int[64], curHue = new int[64];   // für Hysterese
+  static readonly double[] smooth = new double[64];                      // geglättete Helligkeit
+  const double SMOOTHING = 0.25;                                         // Anteil pro Bild (60 fps)
   static readonly int[] stripVal = new int[8], stripCol = new int[8];
   static DateTime t0;
   static readonly Random rnd = new Random();
 
   // Helligkeitsstufen: alle Kombinationen (Variante, Kanal) aufsteigend sortiert
   static readonly List<double[]> steps = BuildSteps();
+  // Gleichmäßige Leiter: die sehr dunkle Variante nur fürs schwache Ausklingen, darüber
+  // durchgehend die helle Variante mit den 7 Kanälen. Ständiges Wechseln zwischen den
+  // Varianten sieht wie Zittern aus, weil sie nicht exakt gleich getönt sind.
   static List<double[]> BuildSteps() {
     var l = new List<double[]>();
-    for (int v = 0; v < 3; v++) for (int c = 0; c < 7; c++) l.Add(new double[] { VARIANT_LEVEL[v] * CHANNEL_LEVEL[c], v, c });
-    l.Sort((a, b) => a[0].CompareTo(b[0]));
-    var dedup = new List<double[]>();
-    foreach (var s in l) if (dedup.Count == 0 || s[0] - dedup[dedup.Count - 1][0] > 0.004) dedup.Add(s);
-    return dedup;
+    for (int c = 0; c < 6; c++) l.Add(new double[] { VARIANT_LEVEL[2] * CHANNEL_LEVEL[c], 2, c });
+    for (int c = 0; c < 7; c++) l.Add(new double[] { VARIANT_LEVEL[0] * CHANNEL_LEVEL[c], 0, c });
+    return l;
   }
 
   static double Now() { return (DateTime.Now - t0).TotalSeconds; }
@@ -196,7 +199,7 @@ public static class ApcIdle {
           pick = frac < 0.5 ? hi - 1 : hi;
           // Helligkeits-Hysterese: bei Werten nahe der Grenze die bisherige Stufe behalten
           int cur = curPick[p];
-          if ((cur == hi - 1 || cur == hi) && frac > 0.25 && frac < 0.75) pick = cur;
+          if ((cur == hi - 1 || cur == hi) && frac > 0.15 && frac < 0.85) pick = cur;
         }
       }
       curPick[p] = pick;
@@ -227,7 +230,7 @@ public static class ApcIdle {
     if (midiInOpen(out inH, inId, keep, IntPtr.Zero, 0x30000) != 0) { midiOutClose(outH); return "Eingang belegt (Live offen?)"; }
     midiInStart(inH);
     t0 = DateTime.Now; stop = false; mode = 0; textDirty = true; clock = 0; nextDrop = 0; drops.Clear();
-    for (int p = 0; p < 64; p++) { sentVel[p] = -1; sentCh[p] = -1; curPick[p] = 0; curHue[p] = 0; }
+    for (int p = 0; p < 64; p++) { sentVel[p] = -1; sentCh[p] = -1; curPick[p] = 0; curHue[p] = 0; smooth[p] = 0; }
     for (int s = 0; s < 8; s++) { stripVal[s] = -999; stripCol[s] = -1; }
     try {
       SysEx(new byte[] { 0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7 });   // Identity: gibt das Display frei
@@ -244,7 +247,10 @@ public static class ApcIdle {
           Line(0, dither && MODE_DITHER[m] ? "APC64 DITHER" : "APC64"); Line(1, NAMES[m]); Line(2, string.Format("Tempo {0:0.00}x", spd));
         }
         Render(clock, now, hue, lvl);
-        for (int p = 0; p < 64; p++) SetPad(p, hue[p], lvl[p]);
+        for (int p = 0; p < 64; p++) {
+          smooth[p] += (lvl[p] - smooth[p]) * SMOOTHING;   // kurze Schwankungen wegfiltern
+          SetPad(p, hue[p], smooth[p]);
+        }
         SetStrips(hue, lvl);
         frame++;
         Thread.Sleep(15);
