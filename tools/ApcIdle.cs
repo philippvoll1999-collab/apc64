@@ -135,7 +135,7 @@ public static class ApcIdle {
     if (m == 0) {                                   // PULS: Tropfen an zufälligen Stellen, weiche Ringe
       if (t >= nextDrop) {
         drops.Add(new double[] { rnd.NextDouble() * 7, rnd.NextDouble() * 7, t, rnd.Next(HUES.Length) });
-        nextDrop = t + 1.5 + rnd.NextDouble() * 2.0;   // alle 1,5 bis 3,5 s (bei Tempo 1x)
+        nextDrop = t + 3.0 + rnd.NextDouble() * 3.0;   // alle 3 bis 6 s (bei Tempo 1x)
       }
       drops.RemoveAll(d => t - d[2] > 4 || t < d[2]);
       foreach (var d in drops) {
@@ -162,7 +162,7 @@ public static class ApcIdle {
     } else if (m == 2) {                            // ATMEN: jedes Pad atmet leicht versetzt, wie Glut
       for (int p = 0; p < 64; p++) {
         double x = p % 8, y = p / 8;
-        double phase = t * 0.22 + Noise(x * 0.35, y * 0.35, 5) * 1.3;
+        double phase = t * 0.125 + Noise(x * 0.35, y * 0.35, 5) * 1.3;   // ein Atemzug ca. 8 s
         double breathe = 0.5 - 0.5 * Math.Cos(2 * Math.PI * phase);
         hue[p] = Noise(x * 0.25, y * 0.25, 1) * 3.2;             // feste warme Töne: rot bis gelb
         lvl[p] = 0.08 + 0.92 * Math.Pow(breathe, 1.8);
