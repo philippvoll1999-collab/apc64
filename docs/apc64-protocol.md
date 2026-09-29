@@ -23,7 +23,7 @@ Stand: 29.09.2026. Quelle: Lives eigenes APC64-Script (dekompiliert in [gluon/Ab
 
 - **Helligkeit per MIDI-Kanal (geprüft):** wie beim APC mini mk2, Kanal 1–7 = 10 / 25 / 50 / 65 / 75 / 90 / 100 %. Lives Script nutzt nur Kanal 1 („halb“, eigentlich 10 %) und 7. Laut mini-mk2-Doku zusätzlich Kanal 8–11 = Pulsieren (1/16 … 1/2), 12–16 = Blinken (1/24 … 1/2).
 - **Farbpalette:** Die 128 Velocity-Farben entsprechen vermutlich der Tabelle im [APC mini mk2 Communication Protocol](https://cdn.inmusicbrands.com/akai/attachments/APC%20mini%20mk2%20-%20Communication%20Protocol%20-%20v1.0.pdf) (z. B. 5 = #FF0000, 13 = #FFFF00, 21 = #00FF00, 45 = #0000FF).
-- **RGB per SysEx `24`** (aus der mini-mk2-Doku): `F0 47 <dev> 53 24 <len_hi> <len_lo> {<start> <end> <R_msb> <R_lsb> <G_msb> <G_lsb> <B_msb> <B_lsb>}… F7`, 8 Bit pro Farbe. Test `tools/apc_rgbtest.ps1` mit Geräte-ID 7F und 00 gelaufen, Ergebnis noch offen.
+- **RGB per SysEx `24`** (aus der mini-mk2-Doku): `F0 47 <dev> 53 24 <len_hi> <len_lo> {<start> <end> <R_msb> <R_lsb> <G_msb> <G_lsb> <B_msb> <B_lsb>}… F7`, 8 Bit pro Farbe. **Geprüft: funktioniert beim APC64 nicht**, weder mit Geräte-ID 7F noch mit 00 (Test `tools/apc_rgbtest.ps1`). Es bleiben die Palettenfarben plus 7 Helligkeitsstufen.
 
 ## SysEx
 
