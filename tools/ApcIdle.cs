@@ -52,7 +52,7 @@ public static class ApcIdle {
   static readonly Random rnd = new Random();
 
   // Zwei Helligkeitsleitern (je Einträge {helligkeit, variante, kanal}):
-  // - gleichmäßig: dunkle Variante nur fürs Ausklingen, darüber helle Variante x 7 Kanäle
+  // - gleichmäßig: dunkle Variante (Kanal 1-2) nur fürs Ausklingen, darüber helle Variante x 7 Kanäle
   // - fein: helle und dunkle Variante x 7 Kanäle, ausgedünnt auf mindestens 6 % Abstand, damit es in der Mitte
   //   genug Zwischenstufen gibt, aber keine Fast-Duplikate, zwischen denen Pads springen
   static readonly List<double[]> evenSteps = BuildSteps();
@@ -72,7 +72,9 @@ public static class ApcIdle {
   // Varianten sieht wie Zittern aus, weil sie nicht exakt gleich getönt sind.
   static List<double[]> BuildSteps() {
     var l = new List<double[]>();
-    for (int c = 0; c < 6; c++) l.Add(new double[] { VARIANT_LEVEL[2] * CHANNEL_LEVEL[c], 2, c });
+    // Ausklingen mit der farbtreuen dunklen Variante (35 %), nicht der sehr dunklen,
+    // die bei manchen Farben anders getönt ist.
+    for (int c = 0; c < 2; c++) l.Add(new double[] { VARIANT_LEVEL[1] * CHANNEL_LEVEL[c], 1, c });
     for (int c = 0; c < 7; c++) l.Add(new double[] { VARIANT_LEVEL[0] * CHANNEL_LEVEL[c], 0, c });
     return l;
   }
