@@ -1,7 +1,9 @@
 using System; using System.Runtime.InteropServices; using System.Threading; using System.Text; using System.Collections.Generic;
 
 // Ruhezustands-Animation für das APC64 im Stil der MikroFX-Idle-Modi.
-// Encoder drücken = nächster Modus, Encoder drehen = Tempo, Pads = Reaktion, Stop = beenden.
+// Encoder drücken = nächster Modus, Encoder drehen = Tempo, Shift = Dithering an/aus,
+// Pads = Reaktion, Stop = beenden.
+// Helligkeit über den MIDI-Kanal: 0..6 = 10/25/50/65/75/90/100 % (wie APC mini mk2).
 public static class ApcIdle {
   [StructLayout(LayoutKind.Sequential)] struct HDR { public IntPtr data; public uint len, rec; public IntPtr user; public uint flags; public IntPtr next, res; public uint offset; [MarshalAs(UnmanagedType.ByValArray, SizeConst=8)] public IntPtr[] r2; }
   delegate void Cb(IntPtr h, uint msg, IntPtr inst, IntPtr p1, IntPtr p2);
@@ -16,10 +18,12 @@ public static class ApcIdle {
   [DllImport("winmm.dll")] static extern uint midiInStop(IntPtr h);
   [DllImport("winmm.dll")] static extern uint midiInClose(IntPtr h);
 
-  const int FULL = 6, HALF = 0;               // LED-Kanäle: volle / halbe Helligkeit
+  const int FULL = 6;                          // LED-Kanal für 100 %
+  static readonly double[] LEVELS = { 0.10, 0.25, 0.50, 0.65, 0.75, 0.90, 1.00 };   // Kanal 0..6
   const int WHITE = 3;
-  const int NOTE_ENC_PUSH = 90, NOTE_STOP = 93, CC_ENCODER = 90;
-  static readonly int[] RAINBOW = { 5, 9, 13, 17, 21, 29, 33, 37, 41, 45, 49, 53, 57 };
+  const int NOTE_ENC_PUSH = 90, NOTE_STOP = 93, NOTE_SHIFT = 120, CC_ENCODER = 90;
+  // Kräftige Palettenfarben nach Farbton sortiert (Werte aus der APC-mini-mk2-Palette)
+  static readonly int[] RAINBOW = { 5, 60, 9, 96, 13, 17, 21, 29, 33, 90, 37, 41, 79, 45, 80, 49, 81, 94, 53, 95, 57 };
   static readonly int[] ROW_COLORS = { 9, 49, 37, 21 };   // orange, lila, cyan, grün (je 2 Reihen)
   static readonly string[] NAMES = { "PULS", "WELLE", "ATMEN", "LAUFLICHT" };
 
@@ -27,7 +31,8 @@ public static class ApcIdle {
   static readonly object lk = new object();
   static readonly List<double[]> touches = new List<double[]>();   // {pad, zeit, farbe}
   static int mode, nextColor; static double speed = 1.5, clock;
-  static volatile bool stop, textDirty = true;
+  static volatile bool stop, textDirty = true, dither;
+  static int frame;
   static readonly int[] sentColor = new int[64], sentCh = new int[64];
   static readonly int[] stripVal = new int[8], stripCol = new int[8];
   static DateTime t0;
@@ -64,6 +69,8 @@ public static class ApcIdle {
         touches.Add(new double[] { d1, Now(), RAINBOW[nextColor] });
       } else if (st == 0x90 && d2 > 0 && d1 == NOTE_ENC_PUSH) {  // Encoder gedrückt: nächster Modus
         mode = (mode + 1) % NAMES.Length; touches.Clear(); textDirty = true;
+      } else if (st == 0x90 && d2 > 0 && d1 == NOTE_SHIFT) {     // Shift: Dithering an/aus
+        dither = !dither; textDirty = true;
       } else if (st == 0x90 && d2 > 0 && d1 == NOTE_STOP) {      // Stop: beenden
         stop = true;
       } else if (st == 0xB0 && d1 == CC_ENCODER) {               // Encoder: Tempo
@@ -131,9 +138,21 @@ public static class ApcIdle {
     }
   }
 
+  // Helligkeit 0..1 auf Kanal 0..6 abbilden; mit Dithering zwischen den zwei
+  // Nachbarstufen wechseln, versetzt pro Pad, damit es nicht im Takt flackert.
+  static int Channel(double v, int p) {
+    if (v < 0.06) return -1;
+    int hi = 0; while (hi < 6 && LEVELS[hi] < v) hi++;
+    if (hi == 0) return 0;
+    int lo = hi - 1;
+    double frac = (v - LEVELS[lo]) / (LEVELS[hi] - LEVELS[lo]);
+    if (!dither) return frac < 0.5 ? lo : hi;
+    double threshold = ((frame * 0.618034) + p * 0.381966) % 1.0;
+    return frac > threshold ? hi : lo;
+  }
+
   static void SetPad(int p, int color, double v) {
-    int ch = -1, c = color;
-    if (v >= 0.6) ch = FULL; else if (v >= 0.22) ch = HALF;
+    int c = color, ch = Channel(v, p);
     if (ch < 0) { c = 0; ch = FULL; }
     if (sentColor[p] == c && sentCh[p] == ch) return;
     sentColor[p] = c; sentCh[p] = ch;
@@ -167,16 +186,17 @@ public static class ApcIdle {
         clock += (now - last) * spd; last = now;
         if (textDirty) {
           textDirty = false; int m; lock (lk) m = mode;
-          Line(0, "APC64"); Line(1, NAMES[m]); Line(2, string.Format("Tempo {0:0.00}x", spd));
+          Line(0, dither ? "APC64 DITHER" : "APC64"); Line(1, NAMES[m]); Line(2, string.Format("Tempo {0:0.00}x", spd));
         }
         Render(clock, now, color, level, strip, scol);
         for (int p = 0; p < 64; p++) SetPad(p, color[p], level[p]);
         for (int s = 0; s < 8; s++) SetStrip(s, scol[s], strip[s]);
-        Thread.Sleep(30);
+        frame++;
+        Thread.Sleep(15);
       }
       return stop ? "Mit Stop beendet" : "Zeit abgelaufen";
     } finally {
-      for (int p = 0; p < 64; p++) { Short(0x90 | FULL, p, 0); Short(0x90 | HALF, p, 0); }
+      for (int p = 0; p < 64; p++) Short(0x90 | FULL, p, 0);
       for (int s = 0; s < 8; s++) { Short(0xB0, 104 + s, 0); Short(0xE0 | s, 0, 0); }
       Line(0, ""); Line(1, ""); Line(2, ""); Apc(0x1C, 0);
       midiInStop(inH); midiInClose(inH); midiOutClose(outH);
