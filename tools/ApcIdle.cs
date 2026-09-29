@@ -33,7 +33,9 @@ public static class ApcIdle {
   // Dithering nur, wo wenige Pads leuchten; bei vollflächigen Modi flackert es sichtbar.
   static readonly bool[] MODE_DITHER = { true, true, true, true };   // nur wirksam, wenn Shift es einschaltet
   static readonly bool[] MODE_FINE = { true, true, true, false };    // feine Leiter; GLUEHWURM nutzt die gleichmäßige
-  const double GAMMA = 2.0;
+  // Hysterese hilft gegen Zittern bei schwankenden Werten, macht gleichmäßige Rampen (ATMEN) aber ruckig
+  static readonly bool[] MODE_HYSTERESIS = { true, true, false, true };
+  static readonly double[] MODE_GAMMA = { 2.0, 2.0, 1.6, 2.0 };
   const double AURORA_LO = 4, AURORA_HI = 13;   // HUES-Index: grün (21) bis pink (57)
 
   static IntPtr outH, inH; static Cb keep;
@@ -60,7 +62,7 @@ public static class ApcIdle {
     for (int v = 0; v < 3; v++) for (int c = 0; c < 7; c++) l.Add(new double[] { VARIANT_LEVEL[v] * CHANNEL_LEVEL[c], v, c });
     l.Sort((a, b) => a[0].CompareTo(b[0]));
     var kept = new List<double[]>();
-    foreach (var x in l) if (kept.Count == 0 || x[0] >= kept[kept.Count - 1][0] * 1.12) kept.Add(x);
+    foreach (var x in l) if (kept.Count == 0 || x[0] >= kept[kept.Count - 1][0] * 1.06) kept.Add(x);
     return kept;
   }
   // Gleichmäßige Leiter: die sehr dunkle Variante nur fürs schwache Ausklingen, darüber
@@ -164,9 +166,9 @@ public static class ApcIdle {
         double x = p % 8, y = p / 8;
         double period = 4.0 + 0.5 * Noise(x * 0.6, y * 0.6, 9);          // pro Pad 4 bis 4,5 s
         double phase = t / period + Noise(x * 0.35, y * 0.35, 5) * 1.3;
-        double breathe = 0.5 - 0.5 * Math.Cos(2 * Math.PI * phase);
+        double breathe = 0.5 - 0.5 * Math.Cos(2 * Math.PI * phase);   // reine Sinuswelle
         hue[p] = Noise(x * 0.25, y * 0.25, 1) * 3.2;             // feste warme Töne: rot bis gelb
-        lvl[p] = 0.08 + 0.92 * Math.Pow(breathe, 1.8);
+        lvl[p] = 0.15 + 0.85 * breathe;
       }
     } else {                                        // GLUEHWURM: schwebende Lichtpunkte
       for (int i = 0; i < flies.Length; i++) {
@@ -201,7 +203,7 @@ public static class ApcIdle {
     int hueIndex = Math.Abs(diff) < 0.75 ? curHue[p] : ideal;
     curHue[p] = hueIndex;
 
-    double target = Math.Pow(Math.Max(0, Math.Min(1, v)), GAMMA);
+    double target = Math.Pow(Math.Max(0, Math.Min(1, v)), MODE_GAMMA[mode]);
     var steps = MODE_FINE[mode] ? fineSteps : evenSteps;
     int vel = 0, ch = FULL;
     if (target >= steps[0][0] * 0.5) {
@@ -214,7 +216,7 @@ public static class ApcIdle {
           pick = frac < 0.5 ? hi - 1 : hi;
           // Helligkeits-Hysterese: bei Werten nahe der Grenze die bisherige Stufe behalten
           int cur = curPick[p];
-          if ((cur == hi - 1 || cur == hi) && frac > 0.15 && frac < 0.85) pick = cur;
+          if (MODE_HYSTERESIS[mode] && (cur == hi - 1 || cur == hi) && frac > 0.15 && frac < 0.85) pick = cur;
         }
       }
       curPick[p] = pick;
