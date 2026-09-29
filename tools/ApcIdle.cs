@@ -135,7 +135,7 @@ public static class ApcIdle {
     if (m == 0) {                                   // PULS: Tropfen an zufälligen Stellen, weiche Ringe
       if (t >= nextDrop) {
         drops.Add(new double[] { rnd.NextDouble() * 7, rnd.NextDouble() * 7, t, rnd.Next(HUES.Length) });
-        nextDrop = t + 0.5 + rnd.NextDouble() * 1.4;
+        nextDrop = t + 1.5 + rnd.NextDouble() * 2.0;   // alle 1,5 bis 3,5 s (bei Tempo 1x)
       }
       drops.RemoveAll(d => t - d[2] > 4 || t < d[2]);
       foreach (var d in drops) {
