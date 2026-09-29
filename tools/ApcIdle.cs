@@ -33,6 +33,7 @@ public static class ApcIdle {
   // Dithering nur, wo wenige Pads leuchten; bei vollflächigen Modi flackert es sichtbar.
   static readonly bool[] MODE_DITHER = { true, false, false, true };
   const double GAMMA = 2.0;
+  const double AURORA_LO = 4, AURORA_HI = 11;   // HUES-Index: grün (21) bis violett (49)
 
   static IntPtr outH, inH; static Cb keep;
   static readonly object lk = new object();
@@ -40,6 +41,7 @@ public static class ApcIdle {
   static int mode, frame; static double speed = 1.0, clock;
   static volatile bool stop, textDirty = true, dither = true;
   static readonly int[] sentVel = new int[64], sentCh = new int[64];
+  static readonly int[] curPick = new int[64], curHue = new int[64];   // für Hysterese
   static readonly int[] stripVal = new int[8], stripCol = new int[8];
   static DateTime t0;
   static readonly Random rnd = new Random();
@@ -108,7 +110,8 @@ public static class ApcIdle {
   static double nextDrop;
   static readonly double[][] flies = new double[6][];           // {x, y, farbton}
 
-  static void Render(double t, double now, int[] hue, double[] lvl) {
+  // hue: kontinuierlicher Index in HUES (wird mit Hysterese gerundet), lvl: Helligkeit 0..1
+  static void Render(double t, double now, double[] hue, double[] lvl) {
     int m; List<double[]> tc;
     lock (lk) { m = mode; touches.RemoveAll(x => now - x[1] > 2.5); tc = new List<double[]>(touches); }
     for (int p = 0; p < 64; p++) { hue[p] = 0; lvl[p] = 0; }
@@ -128,20 +131,24 @@ public static class ApcIdle {
         }
       }
     } else if (m == 1) {                            // AURORA: wabernde Farb- und Helligkeitswolken
+      // Polarlicht: Farbverlauf grün (unten) -> türkis -> cyan -> blau -> violett (oben),
+      // senkrechte Vorhänge, die langsam seitlich wandern.
       for (int p = 0; p < 64; p++) {
         double x = p % 8, y = p / 8;
-        double b = Fbm(x * 0.28 + t * 0.10, y * 0.22 - t * 0.05, t * 0.18);
-        double h = Fbm(x * 0.12 - 3, y * 0.15 + t * 0.03, t * 0.06 + 11) * HUES.Length * 1.6 + t * 0.15;
-        hue[p] = Hue(h); lvl[p] = Math.Pow(Math.Max(0, b - 0.18) / 0.82, 1.3);
+        double curtain = Fbm(x * 0.33 + t * 0.07, y * 0.08 + t * 0.02, t * 0.10);
+        double body = 0.55 + 0.45 * Noise(x * 0.15 + 20, y * 0.25, t * 0.05);
+        double b = Math.Max(0, curtain - 0.22) / 0.78 * body;
+        double drift = (Noise(x * 0.1 + 40, 3, t * 0.04) - 0.5) * 1.6;
+        hue[p] = AURORA_LO + (y / 7.0) * (AURORA_HI - AURORA_LO) + drift;
+        lvl[p] = Math.Pow(b, 1.15);
       }
     } else if (m == 2) {                            // ATMEN: jedes Pad atmet leicht versetzt, wie Glut
       for (int p = 0; p < 64; p++) {
         double x = p % 8, y = p / 8;
         double phase = t * 0.22 + Noise(x * 0.35, y * 0.35, 5) * 1.3;
         double breathe = 0.5 - 0.5 * Math.Cos(2 * Math.PI * phase);
-        double flicker = 0.85 + 0.15 * Noise(x * 1.3, y * 1.3, t * 1.5);
-        hue[p] = Hue(Noise(x * 0.2, y * 0.2, t * 0.02) * 4);    // warme Töne: rot bis gelb
-        lvl[p] = (0.08 + 0.92 * Math.Pow(breathe, 1.8)) * flicker;
+        hue[p] = Noise(x * 0.25, y * 0.25, 1) * 3.2;             // feste warme Töne: rot bis gelb
+        lvl[p] = 0.08 + 0.92 * Math.Pow(breathe, 1.8);
       }
     } else {                                        // GLUEHWURM: schwebende Lichtpunkte
       for (int i = 0; i < flies.Length; i++) {
@@ -167,7 +174,15 @@ public static class ApcIdle {
   }
 
   // Helligkeit 0..1 (mit Gamma) auf eine Stufe (Variante, Kanal) abbilden, mit Dithering dazwischen.
-  static void SetPad(int p, int hueIndex, double v) {
+  static void SetPad(int p, double hueF, double v) {
+    // Farbton mit Hysterese runden: erst wechseln, wenn der Wert die Grenze deutlich überschreitet
+    int n = HUES.Length;
+    int ideal = Hue(Math.Floor(hueF + 0.5));
+    double diff = hueF - curHue[p];
+    diff -= Math.Round(diff / n) * n;
+    int hueIndex = Math.Abs(diff) < 0.75 ? curHue[p] : ideal;
+    curHue[p] = hueIndex;
+
     double target = Math.Pow(Math.Max(0, Math.Min(1, v)), GAMMA);
     int vel = 0, ch = FULL;
     if (target >= steps[0][0] * 0.5) {
@@ -176,21 +191,27 @@ public static class ApcIdle {
       if (hi > 0) {
         double lo = steps[hi - 1][0], up = steps[hi][0], frac = Math.Min(1, (target - lo) / (up - lo));
         if (dither && MODE_DITHER[mode]) pick = frac > ((frame * 0.618034 + p * 0.381966) % 1.0) ? hi : hi - 1;
-        else pick = frac < 0.5 ? hi - 1 : hi;
+        else {
+          pick = frac < 0.5 ? hi - 1 : hi;
+          // Helligkeits-Hysterese: bei Werten nahe der Grenze die bisherige Stufe behalten
+          int cur = curPick[p];
+          if ((cur == hi - 1 || cur == hi) && frac > 0.25 && frac < 0.75) pick = cur;
+        }
       }
+      curPick[p] = pick;
       vel = HUES[hueIndex] + (int)steps[pick][1];
       ch = (int)steps[pick][2];
-    }
+    } else curPick[p] = 0;
     if (sentVel[p] == vel && sentCh[p] == ch) return;
     sentVel[p] = vel; sentCh[p] = ch;
     Short(0x90 | ch, p, vel);
   }
 
   // Strip = Energie der Pad-Spalte, in der Farbe des hellsten Pads der Spalte.
-  static void SetStrips(int[] hue, double[] lvl) {
+  static void SetStrips(double[] hue, double[] lvl) {
     for (int s = 0; s < 8; s++) {
       double sum = 0, best = -1; int bh = 0;
-      for (int r = 0; r < 8; r++) { int p = r * 8 + s; sum += lvl[p]; if (lvl[p] > best) { best = lvl[p]; bh = hue[p]; } }
+      for (int r = 0; r < 8; r++) { int p = r * 8 + s; sum += lvl[p]; if (lvl[p] > best) { best = lvl[p]; bh = curHue[p]; } }
       int color = HUES[bh];
       if (stripCol[s] != color) { stripCol[s] = color; Short(0xB0, 112 + s, color); }
       int val = (int)(Math.Min(1, sum / 3.0) * 16383);
@@ -205,14 +226,14 @@ public static class ApcIdle {
     if (midiInOpen(out inH, inId, keep, IntPtr.Zero, 0x30000) != 0) { midiOutClose(outH); return "Eingang belegt (Live offen?)"; }
     midiInStart(inH);
     t0 = DateTime.Now; stop = false; mode = 0; textDirty = true; clock = 0; nextDrop = 0; drops.Clear();
-    for (int p = 0; p < 64; p++) { sentVel[p] = -1; sentCh[p] = -1; }
+    for (int p = 0; p < 64; p++) { sentVel[p] = -1; sentCh[p] = -1; curPick[p] = 0; curHue[p] = 0; }
     for (int s = 0; s < 8; s++) { stripVal[s] = -999; stripCol[s] = -1; }
     try {
       SysEx(new byte[] { 0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7 });   // Identity: gibt das Display frei
       Thread.Sleep(300);
       Apc(0x1C, 1);
       for (int s = 0; s < 8; s++) Short(0xB0, 104 + s, 1);
-      var hue = new int[64]; var lvl = new double[64];
+      var hue = new double[64]; var lvl = new double[64];
       double last = 0;
       while (!stop && (minutes <= 0 || Now() < minutes * 60)) {
         double now = Now(); double spd; lock (lk) spd = speed;
